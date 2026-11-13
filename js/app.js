@@ -236,7 +236,6 @@ class SoundsEnglishApp {
         <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
           <button class="btn btn-primary btn-sm" id="btn-play-welcome">▶ Play 1994 Welcome (WELLCOME.WAV)</button>
           <button class="btn btn-sm" id="btn-play-intro">▶ Play Full Intro (10.2s · INTRO.WAV)</button>
-          <button class="btn btn-sm" id="btn-play-p">▶ Play P.WAV</button>
         </div>
       `;
       document.getElementById('btn-play-welcome')?.addEventListener('click', () => {
@@ -244,9 +243,6 @@ class SoundsEnglishApp {
       });
       document.getElementById('btn-play-intro')?.addEventListener('click', () => {
         this.audio.playFile(SYSTEM_AUDIO.intro);
-      });
-      document.getElementById('btn-play-p')?.addEventListener('click', () => {
-        this.audio.playFile(SYSTEM_AUDIO.p);
       });
     }
 
