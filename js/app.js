@@ -25,6 +25,7 @@ class SoundsEnglishApp {
     this.idQuiz = null;
     this.axQuiz = null;
     this.recordTarget = null;
+    this.lastComparison = null;
     this.idleTimer = null;
 
     this.cacheDom();
@@ -1231,19 +1232,29 @@ class SoundsEnglishApp {
             ${this.audio.userBuffer ? 'Recording captured! Click "Compare" to hear Native → You → Native.' : 'No microphone recording captured yet.'}
           </p>
         </div>
+
+        ${this.renderComparisonCard()}
       </div>
     `;
 
     document.getElementById('rec-pair-select')?.addEventListener('change', (e) => {
       this.recordTarget = pool[Number(e.target.value)];
       this.selectedRecWord = this.recordTarget.words[0];
+      this.lastComparison = null;
       this.renderRecordMode(panel, unit);
     });
 
     panel.querySelectorAll('[data-rec-word-idx]').forEach((btn) => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         this.selectedRecWord = targetWords[Number(btn.dataset.recWordIdx)];
         this.audio.playFile(this.selectedRecWord.wav);
+        if (this.audio.userBuffer) {
+          this.lastComparison = await this.audio.compareWithModel(
+            this.selectedRecWord.wav,
+            this.selectedRecWord,
+            unit
+          );
+        }
         this.renderRecordMode(panel, unit);
       });
     });
@@ -1260,6 +1271,7 @@ class SoundsEnglishApp {
       const statusEl = document.getElementById('rec-status');
       if (!this.audio.isRecording) {
         try {
+          this.lastComparison = null;
           await this.audio.startRecording();
           this.renderRecordMode(panel, unit);
           const s = document.getElementById('rec-status');
@@ -1269,6 +1281,11 @@ class SoundsEnglishApp {
         }
       } else {
         await this.audio.stopRecording();
+        this.lastComparison = await this.audio.compareWithModel(
+          this.selectedRecWord.wav,
+          this.selectedRecWord,
+          unit
+        );
         this.renderRecordMode(panel, unit);
       }
     });
@@ -1284,6 +1301,68 @@ class SoundsEnglishApp {
         280
       );
     });
+  }
+
+  renderComparisonCard() {
+    const c = this.lastComparison;
+    if (!c) return '';
+
+    if (c.tooQuiet) {
+      return `
+        <div class="similarity-card is-low">
+          <div class="similarity-header">
+            <h4>Acoustic Comparison</h4>
+            <span class="similarity-score">—</span>
+          </div>
+          <ul class="similarity-tips">
+            ${c.tips.map((t) => `<li>${t}</li>`).join('')}
+          </ul>
+        </div>
+      `;
+    }
+
+    const tierClass = c.overallPct >= 78 ? 'is-high' : c.overallPct >= 55 ? 'is-mid' : 'is-low';
+    const hasSib = c.modelSibilantHz > 0 && c.userSibilantHz > 0;
+
+    return `
+      <div class="similarity-card ${tierClass}">
+        <div class="similarity-header">
+          <div>
+            <h4>Acoustic Similarity to Model</h4>
+            <span style="font-size:0.78rem; color:var(--text-secondary);">
+              Bark-band spectral trajectory + centroid + active duration
+            </span>
+          </div>
+          <span class="similarity-score">${c.overallPct}%</span>
+        </div>
+
+        <div class="similarity-bar-track" aria-hidden="true">
+          <div class="similarity-bar-fill" style="width:${c.overallPct}%"></div>
+        </div>
+
+        <div class="similarity-metrics">
+          <div class="metric-pill">
+            <span>Spectral Match</span>
+            <strong>${c.spectralPct}%</strong>
+          </div>
+          <div class="metric-pill">
+            <span>Duration (${c.userMs} vs ${c.modelMs} ms)</span>
+            <strong>${c.durationPct}%</strong>
+          </div>
+          <div class="metric-pill">
+            <span>${hasSib ? `Fricative Peak (${c.userSibilantHz} vs ${c.modelSibilantHz} Hz)` : `Centroid (${c.userCentroidHz} vs ${c.modelCentroidHz} Hz)`}</span>
+            <strong>${c.centroidPct}%</strong>
+          </div>
+        </div>
+
+        <div class="similarity-tips-wrap">
+          <h5>Coaching Feedback</h5>
+          <ul class="similarity-tips">
+            ${c.tips.map((t) => `<li>${t}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
   }
 
   registerServiceWorker() {

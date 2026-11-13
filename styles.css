@@ -1146,3 +1146,111 @@ dialog.app-dialog {
 [hidden] {
   display: none !important;
 }
+
+/* Acoustic Comparison & Similarity Card */
+.similarity-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  padding: 1rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+
+  &.is-high {
+    border-color: var(--accent-success);
+  }
+
+  &.is-mid {
+    border-color: var(--accent-warn);
+  }
+
+  &.is-low {
+    border-color: var(--accent-danger);
+  }
+}
+
+.similarity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+
+  h4 {
+    margin: 0;
+    font-size: 0.98rem;
+  }
+}
+
+.similarity-score {
+  font-family: var(--font-mono);
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: var(--accent-primary);
+
+  .is-high & { color: var(--accent-success); }
+  .is-mid & { color: var(--accent-warn); }
+  .is-low & { color: var(--accent-danger); }
+}
+
+.similarity-bar-track {
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  overflow: hidden;
+}
+
+.similarity-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent-primary);
+  transition: width 350ms ease;
+
+  .is-high & { background: var(--accent-success); }
+  .is-mid & { background: var(--accent-warn); }
+  .is-low & { background: var(--accent-danger); }
+}
+
+.similarity-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.55rem;
+}
+
+.metric-pill {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.7rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+
+  strong {
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+    color: var(--text-primary);
+  }
+}
+
+.similarity-tips-wrap {
+  h5 {
+    margin: 0 0 0.35rem;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+  }
+}
+
+.similarity-tips {
+  margin: 0;
+  padding-left: 1.15rem;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.86rem;
+  color: var(--text-primary);
+}
