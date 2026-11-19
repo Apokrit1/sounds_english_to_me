@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sounds-english-v1';
+const CACHE_NAME = 'sounds-english-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,6 +7,9 @@ const APP_SHELL = [
   './js/audio-engine.js',
   './data/curriculum.js',
   './manifest.webmanifest',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/apple-touch-icon.png',
 ];
 
 self.addEventListener('install', (event) => {
