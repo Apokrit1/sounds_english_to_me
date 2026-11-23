@@ -230,7 +230,7 @@ class SoundsEnglishApp {
       if (!this.coachToast || !this.coachText) return;
       if (this.state.view === 'contents') {
         this.coachText.textContent =
-          'Tip: Hover or click the speaker icon on any Unit card to preview the contrast, or open Unit 1 (/s/ vs. /ʃ/) to try live spectral biofeedback.';
+          'Tip: Click ▶ Preview on any Unit card to hear the contrast, or open Unit 1 (/s/ vs. /ʃ/) to try live spectral biofeedback.';
       } else {
         this.coachText.textContent =
           'Tip: Click any word to hear it, click + to hear the minimal pair back-to-back, or switch to Identification Test to check your perception.';
@@ -743,8 +743,9 @@ class SoundsEnglishApp {
     });
 
     // Preload WAVs for snappy playback
-    const wavs = [...unit.unitAudio];
+    const wavs = [...unit.unitAudio, ...(unit.altUnitAudio || [])];
     for (const g of unit.groups) {
+      if (g.contrastAudio) wavs.push(g.contrastAudio);
       for (const item of g.items) {
         for (const w of item.words) {
           wavs.push(w.wav, ...(w.altWavs || []));
@@ -875,7 +876,8 @@ class SoundsEnglishApp {
       });
     }
     document.getElementById('btn-play-unit-banner')?.addEventListener('click', () => {
-      this.audio.playSequence(unit.unitAudio, 180);
+      const seq = [...unit.unitAudio, ...(unit.altUnitAudio || [])];
+      this.audio.playSequence(seq, 180);
     });
 
     // Phoneme chips play sound as well as opening popover
@@ -1003,7 +1005,10 @@ class SoundsEnglishApp {
     panel.innerHTML = `
       <div class="subgroup-bar">
         ${subgroupPills}
-        <button class="btn btn-sm" id="btn-pair-drill">▶ Auto Pair Drill</button>
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+          ${activeGroup.contrastAudio ? '<button class="btn btn-sm" id="btn-contrast-audio">▶ Hear Contrast</button>' : ''}
+          <button class="btn btn-sm" id="btn-pair-drill">▶ Auto Pair Drill</button>
+        </div>
       </div>
       <div class="pairs-list">${rowsHtml}</div>
     `;
@@ -1011,8 +1016,18 @@ class SoundsEnglishApp {
     panel.querySelectorAll('[data-group-idx]').forEach((pill) => {
       pill.addEventListener('click', () => {
         this.state.groupIndex = Number(pill.dataset.groupIdx);
+        const selectedGroup = groups[this.state.groupIndex];
+        if (selectedGroup?.contrastAudio) {
+          this.audio.playFile(selectedGroup.contrastAudio);
+        }
         this.renderExploreMode(panel, unit);
       });
+    });
+
+    document.getElementById('btn-contrast-audio')?.addEventListener('click', () => {
+      if (activeGroup.contrastAudio) {
+        this.audio.playFile(activeGroup.contrastAudio);
+      }
     });
 
     panel.querySelectorAll('[data-wav]').forEach((btn) => {
@@ -1395,7 +1410,7 @@ class SoundsEnglishApp {
         <div class="quiz-prompt-box">
           <h3>Are these two recordings the SAME word or DIFFERENT words?</h3>
           <p>Trains phonemic categorization across acoustic tokens rather than raw waveform matching.</p>
-          <button class="btn btn-primary" id="btn-ax-replay">▶ Play A → X Pair</button>
+          <button class="btn btn-primary" id="btn-ax-replay">▶ Play the two words</button>
         </div>
 
         <div class="quiz-options-grid">

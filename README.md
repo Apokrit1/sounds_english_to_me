@@ -10,6 +10,7 @@ Modernized web studio for the 1994 ToolBook 3.0 Computer-Assisted Language Learn
   3. **AX Same / Different** (cross-token categorical discrimination)
   4. **Record & Compare Lab** (live Web Audio FFT spectrum & spectral centroid meter + `Native → You → Native` loop)
 - **Greek L1 Interference Coaching:** Explains PAM-L2 mergers (e.g., Greek retracted `[s̠]` vs. English `/s, ʃ/`) and vowel-space crowding.
+- **Transcription Convention:** Follows the standard British dictionary convention (J. C. Wells, *Longman Pronunciation Dictionary*; *Cambridge English Pronouncing Dictionary*): `/e/` = DRESS (*bed*), `/eə/` = SQUARE (*chair*).
 - **Offline PWA Support** and full preservation of the original 1994 ToolBook archive (`GLOT.TBK`, `SCRIPT.WRI`, `*.WAV`).
 
 ## Run Locally

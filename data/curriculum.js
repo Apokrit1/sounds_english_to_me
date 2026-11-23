@@ -6,18 +6,11 @@
  */
 
 export const SYSTEM_AUDIO = {
-  welcome: 'WELLCOME.WAV',
-  intro: 'INTRO.WAV',
   okey: 'OKEY.WAV',
   correct: ['CORRECT.WAV', 'WELLDONE.WAV', 'OKEY.WAV'],
   incorrect: ['TRYAGAIN.WAV', 'AREUSURE.WAV', 'AREUSURB.WAV'],
   haveAGo: 'HAVEAGO.WAV',
   pairDrill: 'PAIRDRIL.WAV',
-  likeThat: 'LIKETHAT.WAV',
-  example: 'EXAMPLE.WAV',
-  unit: 'UNIT.WAV',
-  and: 'AND.WAV',
-  p: 'P.WAV',
 };
 
 export const CATEGORIES = [
@@ -41,7 +34,7 @@ export const CATEGORIES = [
   },
   {
     id: 'vowels-back-diphthongs',
-    title: 'Vowels & Diphthongs: Back Contrasts & Glides',
+    title: 'Back Vowels & Diphthongs',
     description:
       'Separates /ɒ, ʌ, ɑː/, closing diphthongs /əʊ, aʊ/, and restored high-back /ʊ/ vs. /uː/.',
   },
@@ -465,7 +458,7 @@ export const UNITS = [
     id: 'unit5',
     number: 5,
     badge: 'Unit 5',
-    title: '/ŋ/ vs. /ŋk/',
+    title: '/ŋ/ vs. /ŋ/ + /k/',
     subtitle: 'sing · sink',
     category: 'consonants-nasals-schwa',
     pamType: 'Allophonic Neutralization & Stop Epenthesis',
@@ -480,7 +473,7 @@ export const UNITS = [
         articulation: 'Back of tongue seals against soft palate; air flows purely through nose without /k/ or /ɡ/ release.',
       },
       {
-        ipa: '/ŋk/',
+        ipa: '/ŋ/ + /k/',
         label: 'Velar Nasal + Voiceless Velar Stop',
         audio: 'SINK.WAV',
         frequencyHint: 'Short clipped nasal followed by /k/ burst',
@@ -493,7 +486,7 @@ export const UNITS = [
       greekSystem:
         'Because Greek [ŋ] is always coupled to a following velar consonant, Greek learners automatically insert an epenthetic [k] or [ɡ] at the end of English "-ng" words.',
       englishTarget:
-        'English /ŋ/ ends smoothly with nasal resonance and no oral burst; /ŋk/ clips the nasal shorter and ends with a distinct voiceless /k/ release.',
+        'English /ŋ/ ends smoothly with nasal resonance and no oral burst; /ŋ/ + /k/ clips the nasal shorter and ends with a distinct voiceless /k/ release.',
       coachingTip:
         'Keep the back of your tongue pressed against the soft palate as your voice stops—do NOT drop the tongue while air pressure is built up, or an accidental [k]/[ɡ] will pop out.',
       spectralMode: 'nasal',
@@ -501,7 +494,7 @@ export const UNITS = [
     groups: [
       {
         id: 'u5-main',
-        label: '/ŋ/ vs. /ŋk/ Minimal Pairs',
+        label: '/ŋ/ vs. /ŋ/ + /k/ Minimal Pairs',
         contrastAudio: 'NANDNK.WAV',
         items: [
           {
@@ -542,7 +535,7 @@ export const UNITS = [
     id: 'unit6',
     number: 6,
     badge: 'Unit 6',
-    title: '/∅/ vs. /ə/',
+    title: 'No final vowel vs. final /ə/',
     subtitle: 'date · data',
     category: 'consonants-nasals-schwa',
     pamType: 'Prosodic Reduction & Final Schwa Epenthesis',
@@ -550,7 +543,7 @@ export const UNITS = [
     unitAudio: ['UNIT6.WAV', 'FINALSWA.WAV'],
     phonemes: [
       {
-        ipa: '/∅/',
+        ipa: '∅ (no vowel)',
         label: 'Closed Syllable (No Final Vowel)',
         audio: 'DATE.WAV',
         frequencyHint: 'Ends cleanly on coda consonant',
@@ -578,7 +571,7 @@ export const UNITS = [
     groups: [
       {
         id: 'u6-main',
-        label: 'Zero vs. Final Schwa (/ə/)',
+        label: 'No Final Vowel vs. Final Schwa (/ə/)',
         contrastAudio: 'FINALSWA.WAV',
         items: [
           {
@@ -658,7 +651,7 @@ export const UNITS = [
     ],
     l1Interference: {
       summary:
-        'Greek has NO central vowels at all—the entire center of the Greek vowel space is empty! Learners scatter English /ɜː/ ("bird, work, burn") outward to Greek /e/, /o/, or /a/, often misled by spelling ("er, or, ir, ur").',
+        'Greek has no mid-central vowels (/ɜː, ə/) and no /ʌ/; its only central vowel is open /a/. Learners scatter English /ɜː/ ("bird, work, burn") outward to Greek /e/, /o/, or /a/, often misled by spelling ("er, or, ir, ur").',
       greekSystem:
         'Five perimeter cardinal vowels (/i, e, a, o, u/) pull central /ɜː/ toward whichever peripheral vowel resembles the orthography.',
       englishTarget:
