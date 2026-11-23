@@ -5,18 +5,25 @@ import {
   SYSTEM_AUDIO,
   CREDITS_1994,
 } from '../data/curriculum.js';
+import { GLOSSARY } from '../data/glossary.js';
 import { AudioEngine } from './audio-engine.js';
+import { GeminiTtsPlayer, GEMINI_VOICES } from './gemini-tts.js';
 
 const STORAGE_KEY = 'sounds-english-to-me:stats:v1';
 
 class SoundsEnglishApp {
   constructor() {
     this.audio = new AudioEngine();
+    this.tts = new GeminiTtsPlayer(this.audio);
+    this.glossaryEntries = this.buildGlossaryEntries();
     this.state = {
-      view: 'contents', // 'contents' | 'unit'
+      view: 'contents', // 'contents' | 'unit' | 'glossary'
       unitId: 'unit1',
       mode: 'explore', // 'explore' | 'identify' | 'ax' | 'record'
       groupIndex: 0,
+      glossaryQuery: '',
+      glossaryLetter: 'ALL',
+      glossaryLevel: 'ALL',
       theme: localStorage.getItem('setm-theme') || 'dark',
       stats: this.loadStats(),
     };
@@ -127,6 +134,12 @@ class SoundsEnglishApp {
 
     this.themeBtn?.addEventListener('click', () => {
       this.applyTheme(this.state.theme === 'dark' ? 'light' : 'dark');
+    });
+
+    document.getElementById('btn-open-glossary')?.addEventListener('click', () => {
+      this.navigate(() => {
+        this.state.view = 'glossary';
+      });
     });
 
     document.getElementById('btn-open-theory')?.addEventListener('click', () => {
@@ -344,9 +357,269 @@ class SoundsEnglishApp {
   render() {
     if (this.state.view === 'contents') {
       this.renderContentsView();
+    } else if (this.state.view === 'glossary') {
+      this.renderGlossaryView();
     } else {
       this.renderUnitView();
     }
+  }
+
+  buildGlossaryEntries() {
+    const map = new Map();
+    for (const u of UNITS) {
+      for (const g of u.groups) {
+        for (const item of g.items) {
+          for (const w of item.words) {
+            const key = w.text.toLowerCase();
+            if (!map.has(key)) {
+              const gEntry = GLOSSARY[key] || {
+                pos: 'word',
+                level: 'A2',
+                definition: `Target pronunciation word (${w.ipa}).`,
+                example: `Listen carefully to the word "${w.text}".`,
+              };
+              map.set(key, {
+                word: w.text,
+                ipa: w.ipa,
+                wav: w.wav,
+                pos: gEntry.pos,
+                level: gEntry.level,
+                definition: gEntry.definition,
+                example: gEntry.example,
+                units: [],
+              });
+            }
+            const rec = map.get(key);
+            if (!rec.units.some((x) => x.id === u.id)) {
+              rec.units.push({ id: u.id, badge: u.badge });
+            }
+          }
+        }
+      }
+    }
+    return [...map.values()].sort((a, b) =>
+      a.word.toLowerCase().localeCompare(b.word.toLowerCase())
+    );
+  }
+
+  renderGlossaryView() {
+    const query = this.state.glossaryQuery.trim().toLowerCase();
+    const letter = this.state.glossaryLetter;
+    const levelFilter = this.state.glossaryLevel;
+
+    const letters = [...new Set(this.glossaryEntries.map((e) => e.word[0].toUpperCase()))].sort();
+
+    const filtered = this.glossaryEntries.filter((e) => {
+      if (letter !== 'ALL' && e.word[0].toUpperCase() !== letter) return false;
+      if (levelFilter === 'B1_C1' && !['B1', 'B2', 'C1'].includes(e.level)) return false;
+      if (levelFilter === 'A1_A2' && !['A1', 'A2'].includes(e.level)) return false;
+      if (query) {
+        const hay = `${e.word} ${e.definition} ${e.example} ${e.units.map((u) => u.badge).join(' ')}`.toLowerCase();
+        if (!hay.includes(query)) return false;
+      }
+      return true;
+    });
+
+    const hasApiKey = Boolean(this.tts.getApiKey());
+    const activeVoice = this.tts.getVoice();
+
+    const alphaButtonsHtml = ['ALL', ...letters]
+      .map(
+        (ch) => `
+        <button class="alpha-btn" data-alpha="${ch}" aria-pressed="${letter === ch}">
+          ${ch === 'ALL' ? 'All' : ch}
+        </button>`
+      )
+      .join('');
+
+    const voiceOptionsHtml = GEMINI_VOICES.map(
+      (v) => `<option value="${v.id}" ${v.id === activeVoice ? 'selected' : ''}>${v.label}</option>`
+    ).join('');
+
+    const cardsHtml = filtered
+      .map((e, idx) => {
+        const isAdv = ['B1', 'B2', 'C1'].includes(e.level);
+        const unitChips = e.units
+          .map(
+            (u) =>
+              `<button class="token-chip" data-jump-unit="${u.id}" title="Open ${u.badge}">${u.badge}</button>`
+          )
+          .join('');
+        return `
+          <article class="glossary-card">
+            <div class="glossary-card-top">
+              <div class="glossary-word-title">
+                <h3>${e.word}</h3>
+                <span class="glossary-ipa">${e.ipa}</span>
+                <span class="glossary-pos">${e.pos}</span>
+              </div>
+              <span class="level-badge ${isAdv ? 'is-advanced' : ''}">${e.level}</span>
+            </div>
+            <p class="glossary-def">${e.definition}</p>
+            <p class="glossary-example">“${e.example}”</p>
+            <div class="glossary-card-footer">
+              <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+                <button class="btn btn-sm" data-gloss-wav="${e.wav}" title="Play 1994 studio recording">▶ Word</button>
+                <button class="btn btn-sm btn-primary" data-gloss-tts="${idx}" title="Read definition & example with Gemini TTS">
+                  🔊 Read Def &amp; Example
+                </button>
+              </div>
+              <div class="glossary-unit-links">${unitChips}</div>
+            </div>
+          </article>
+        `;
+      })
+      .join('');
+
+    this.appMain.innerHTML = `
+      <div class="studio-topbar">
+        <button class="btn btn-sm" id="btn-gloss-back">← Contents</button>
+        <span style="font-size:0.85rem; color:var(--text-secondary);">
+          Showing <strong>${filtered.length}</strong> of <strong>${this.glossaryEntries.length}</strong> words
+        </span>
+      </div>
+
+      <section class="glossary-header-card">
+        <div>
+          <h1 class="studio-title" style="margin-bottom:0.3rem;">Alphabetical Glossary (A–Z)</h1>
+          <p style="margin:0; font-size:0.9rem; color:var(--text-secondary);">
+            Every word from all 14 units with a simple English definition, example sentence, CEFR level,
+            original 1994 pronunciation audio, and <strong>Gemini TTS</strong> voice reading.
+          </p>
+        </div>
+
+        <div class="glossary-controls-row">
+          <input
+            type="search"
+            id="glossary-search-input"
+            class="glossary-search"
+            placeholder="Search word, meaning, or unit (e.g. etch, wits, Unit 1)…"
+            value="${this.state.glossaryQuery.replace(/"/g, '&quot;')}"
+          />
+          <select id="glossary-level-select" class="btn btn-sm" aria-label="Filter by CEFR level">
+            <option value="ALL" ${levelFilter === 'ALL' ? 'selected' : ''}>All Levels (A1–C1)</option>
+            <option value="B1_C1" ${levelFilter === 'B1_C1' ? 'selected' : ''}>B1–C1 Vocabulary Only</option>
+            <option value="A1_A2" ${levelFilter === 'A1_A2' ? 'selected' : ''}>A1–A2 Core Words</option>
+          </select>
+        </div>
+
+        <details class="tts-settings-details" ${!hasApiKey ? 'open' : ''}>
+          <summary>
+            Gemini TTS Voice Settings · Status:
+            <span id="tts-status-label" style="color:${hasApiKey ? 'var(--accent-success)' : 'var(--accent-warn)'};">
+              ${hasApiKey ? `Gemini TTS Ready (${activeVoice})` : 'Browser Fallback (add Gemini API key for Gemini TTS)'}
+            </span>
+          </summary>
+          <div class="tts-settings-body">
+            <input
+              type="password"
+              id="gemini-key-input"
+              class="glossary-search"
+              style="max-width:340px;"
+              placeholder="Paste Gemini API key (saved locally in browser)…"
+              value="${this.tts.getApiKey()}"
+            />
+            <select id="gemini-voice-select" class="btn btn-sm" aria-label="Gemini TTS Voice">
+              ${voiceOptionsHtml}
+            </select>
+            <button class="btn btn-sm btn-primary" id="btn-save-gemini">Save Settings</button>
+            <button class="btn btn-sm" id="btn-clear-gemini">Clear Key</button>
+          </div>
+          <p style="margin:0.55rem 0 0; font-size:0.78rem; color:var(--text-secondary);">
+            Uses <code>gemini-2.5-flash-preview-tts</code> (or pre-generated <code>audio/glossary/*.wav</code> if present).
+            Your API key stays only in your browser’s <code>localStorage</code> and is sent directly to Google’s Gemini API.
+          </p>
+        </details>
+      </section>
+
+      <div class="alpha-bar" role="group" aria-label="Filter by starting letter">
+        ${alphaButtonsHtml}
+      </div>
+
+      <div class="glossary-grid">
+        ${cardsHtml || '<p style="color:var(--text-secondary);">No matching words found.</p>'}
+      </div>
+    `;
+
+    document.getElementById('btn-gloss-back')?.addEventListener('click', () => {
+      this.tts.stop();
+      this.navigate(() => {
+        this.state.view = 'contents';
+      });
+    });
+
+    document.getElementById('glossary-search-input')?.addEventListener('input', (e) => {
+      this.state.glossaryQuery = e.target.value;
+      this.renderGlossaryView();
+      const el = document.getElementById('glossary-search-input');
+      if (el) {
+        el.focus();
+        el.setSelectionRange(el.value.length, el.value.length);
+      }
+    });
+
+    document.getElementById('glossary-level-select')?.addEventListener('change', (e) => {
+      this.state.glossaryLevel = e.target.value;
+      this.renderGlossaryView();
+    });
+
+    this.appMain.querySelectorAll('[data-alpha]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.state.glossaryLetter = btn.dataset.alpha;
+        this.renderGlossaryView();
+      });
+    });
+
+    document.getElementById('btn-save-gemini')?.addEventListener('click', () => {
+      const key = document.getElementById('gemini-key-input')?.value || '';
+      const voice = document.getElementById('gemini-voice-select')?.value || 'Kore';
+      this.tts.setApiKey(key);
+      this.tts.setVoice(voice);
+      this.renderGlossaryView();
+    });
+
+    document.getElementById('btn-clear-gemini')?.addEventListener('click', () => {
+      this.tts.setApiKey('');
+      this.renderGlossaryView();
+    });
+
+    this.appMain.querySelectorAll('[data-gloss-wav]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.tts.stop();
+        btn.classList.add('is-playing');
+        this.audio.playFile(btn.dataset.glossWav).finally(() => {
+          btn.classList.remove('is-playing');
+        });
+      });
+    });
+
+    this.appMain.querySelectorAll('[data-gloss-tts]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const entry = filtered[Number(btn.dataset.glossTts)];
+        if (!entry) return;
+        const origLabel = btn.textContent;
+        btn.classList.add('is-playing');
+        btn.textContent = '⏳ Speaking…';
+        try {
+          const result = await this.tts.speakEntry(entry);
+          const statusEl = document.getElementById('tts-status-label');
+          if (statusEl && result.error) {
+            statusEl.textContent = `Fallback used (${result.error})`;
+            statusEl.style.color = 'var(--accent-warn)';
+          }
+        } finally {
+          btn.classList.remove('is-playing');
+          btn.textContent = origLabel;
+        }
+      });
+    });
+
+    this.appMain.querySelectorAll('[data-jump-unit]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.tts.stop();
+        this.openUnit(btn.dataset.jumpUnit);
+      });
+    });
   }
 
   getUnitAccuracyText(unitId) {

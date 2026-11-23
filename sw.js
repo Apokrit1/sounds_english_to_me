@@ -1,11 +1,13 @@
-const CACHE_NAME = 'sounds-english-v4';
+const CACHE_NAME = 'sounds-english-v5';
 const APP_SHELL = [
   './',
   './index.html',
   './styles.css',
   './js/app.js',
   './js/audio-engine.js',
+  './js/gemini-tts.js',
   './data/curriculum.js',
+  './data/glossary.js',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',

@@ -1254,3 +1254,198 @@ dialog.app-dialog {
   font-size: 0.86rem;
   color: var(--text-primary);
 }
+
+/* ==========================================================================
+   Alphabetical Glossary Page & Gemini TTS Controls
+   ========================================================================== */
+
+.glossary-header-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.4rem;
+  margin-bottom: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.glossary-controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.glossary-search {
+  flex: 1 1 240px;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.9rem;
+
+  &:focus {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 1px;
+  }
+}
+
+.tts-settings-details {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.9rem;
+
+  summary {
+    cursor: pointer;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    user-select: none;
+  }
+}
+
+.tts-settings-body {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.alpha-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 1.15rem;
+}
+
+.alpha-btn {
+  min-width: 2rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+  }
+
+  &[aria-pressed='true'] {
+    background: var(--accent-primary);
+    border-color: transparent;
+    color: light-dark(#ffffff, #082f49);
+  }
+}
+
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 0.95rem;
+}
+
+.glossary-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  box-shadow: var(--shadow-sm);
+
+  &:has(.is-playing) {
+    border-color: var(--accent-primary);
+    background: linear-gradient(180deg, var(--accent-primary-soft), var(--bg-surface));
+  }
+}
+
+.glossary-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.glossary-word-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+
+  h3 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+
+  .glossary-ipa {
+    font-family: var(--font-mono);
+    font-size: 0.86rem;
+    color: var(--accent-primary);
+  }
+
+  .glossary-pos {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+}
+
+.level-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.14rem 0.48rem;
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+
+  &.is-advanced {
+    background: var(--accent-warn-soft);
+    color: var(--accent-warn);
+  }
+}
+
+.glossary-def {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.glossary-example {
+  margin: 0;
+  padding: 0.5rem 0.7rem;
+  border-left: 2px solid var(--accent-secondary);
+  background: var(--bg-subtle);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.glossary-card-footer {
+  margin-top: auto;
+  padding-top: 0.45rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.glossary-unit-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
