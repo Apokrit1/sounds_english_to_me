@@ -26,6 +26,7 @@ class SoundsEnglishApp {
     this.axQuiz = null;
     this.recordTarget = null;
     this.lastComparison = null;
+    this.deferredInstallPrompt = null;
     this.idleTimer = null;
 
     this.cacheDom();
@@ -149,6 +150,26 @@ class SoundsEnglishApp {
       if (this.coachToast) this.coachToast.hidden = true;
     });
 
+    const installBtn = document.getElementById('btn-install-pwa');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      this.deferredInstallPrompt = e;
+      if (installBtn) installBtn.hidden = false;
+    });
+
+    installBtn?.addEventListener('click', async () => {
+      if (!this.deferredInstallPrompt) return;
+      this.deferredInstallPrompt.prompt();
+      await this.deferredInstallPrompt.userChoice;
+      this.deferredInstallPrompt = null;
+      installBtn.hidden = true;
+    });
+
+    window.addEventListener('appinstalled', () => {
+      this.deferredInstallPrompt = null;
+      if (installBtn) installBtn.hidden = true;
+    });
+
     // Close dialogs when clicking backdrop
     for (const dlg of Object.values(this.dialogs)) {
       dlg?.addEventListener('click', (e) => {
@@ -233,17 +254,7 @@ class SoundsEnglishApp {
         <p>Originally authored in <strong>ToolBook 3.0 (${CREDITS_1994.year})</strong> by <strong>${CREDITS_1994.author}</strong> for the <strong>${CREDITS_1994.degree}</strong>.</p>
         <blockquote class="credits-quote">${CREDITS_1994.creditsText}</blockquote>
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">${CREDITS_1994.copyrightNote}</p>
-        <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
-          <button class="btn btn-primary btn-sm" id="btn-play-welcome">▶ Play 1994 Welcome (WELLCOME.WAV)</button>
-          <button class="btn btn-sm" id="btn-play-intro">▶ Play Full Intro (10.2s · INTRO.WAV)</button>
-        </div>
       `;
-      document.getElementById('btn-play-welcome')?.addEventListener('click', () => {
-        this.audio.playFile(SYSTEM_AUDIO.welcome);
-      });
-      document.getElementById('btn-play-intro')?.addEventListener('click', () => {
-        this.audio.playFile(SYSTEM_AUDIO.intro);
-      });
     }
 
     document.getElementById('btn-play-okey')?.addEventListener('click', () => {
@@ -411,9 +422,7 @@ class SoundsEnglishApp {
             spectral biofeedback.
           </p>
           <div class="hero-controls">
-            <button class="btn btn-primary" id="btn-hero-welcome">▶ Play 1994 Welcome</button>
-            <button class="btn" id="btn-hero-intro">▶ Full Spoken Intro (10s)</button>
-            <button class="btn" id="btn-hero-start-u1">Start with Unit 1 (/s/ vs. /ʃ/)</button>
+            <button class="btn btn-primary" id="btn-hero-start-u1">Start with Unit 1 (/s/ vs. /ʃ/)</button>
           </div>
         </div>
         <aside class="hero-stats-box" aria-label="Course progress summary">
@@ -426,12 +435,6 @@ class SoundsEnglishApp {
       ${sectionsHtml}
     `;
 
-    document.getElementById('btn-hero-welcome')?.addEventListener('click', () => {
-      this.audio.playFile(SYSTEM_AUDIO.welcome);
-    });
-    document.getElementById('btn-hero-intro')?.addEventListener('click', () => {
-      this.audio.playFile(SYSTEM_AUDIO.intro);
-    });
     document.getElementById('btn-hero-start-u1')?.addEventListener('click', () => {
       this.openUnit('unit1');
     });
