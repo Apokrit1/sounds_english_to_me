@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sounds English to Me — Phonetic Minimal-Pair Studio</title>
+  <title>Sounds English to Me | Phonetic Minimal-Pair Studio</title>
   <meta
     name="description"
-    content="Modernized 1994 UCL MSc Speech & Hearing Sciences minimal-pair phonetic training app for Greek learners of English, featuring HVPT drills and live spectral biofeedback."
+    content="Modernized 1994 UCL MSc Speech & Hearing Sciences minimal-pair phonetic training studio for Greek learners of English, with cross-token drills and live spectral feedback."
   />
-  <meta name="theme-color" content="#0b1120" />
+  <meta name="theme-color" content="#0a0f18" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
@@ -17,24 +17,22 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <header class="app-header">
+  <header class="app-header" id="app-header">
     <div class="header-inner">
-      <button class="brand-btn" id="btn-home" title="Return to Contents">
-        <span class="brand-mark" aria-hidden="true">ʃ/s</span>
-        <span>
-          <span class="brand-title">Sounds English to Me</span>
-          <span class="brand-sub">UCL MSc Speech &amp; Hearing Sciences (1994 · Modernized)</span>
-        </span>
+      <button class="brand-btn" id="btn-home" title="Return to contents">
+        <span class="brand-slash" aria-hidden="true">/</span>
+        <span class="brand-title">Sounds English to Me</span>
       </button>
 
       <nav class="header-actions" aria-label="Application utilities">
-        <button class="btn btn-sm btn-primary" id="btn-install-pwa" hidden>⬇ Install App</button>
-        <button class="btn btn-sm" id="btn-open-glossary">Glossary (A–Z)</button>
-        <button class="btn btn-sm" id="btn-open-theory">L1 Interference Theory</button>
-        <button class="btn btn-sm" id="btn-open-stats">Confusion Matrix</button>
-        <button class="btn btn-sm" id="btn-open-credits">1994 Credits</button>
-        <button class="btn btn-sm" id="btn-open-help">Help</button>
-        <button class="btn btn-sm btn-ghost" id="btn-theme">Light Mode</button>
+        <button class="nav-link nav-link-accent" id="btn-install-pwa" hidden>Install app</button>
+        <button class="nav-link" id="btn-open-glossary">Glossary (A–Z)</button>
+        <button class="nav-link" id="btn-open-theory">L1 theory</button>
+        <button class="nav-link" id="btn-open-stats">Confusion matrix</button>
+        <button class="nav-link" id="btn-open-credits">1994 credits</button>
+        <button class="nav-link" id="btn-open-help">Help</button>
+        <span class="nav-divider" aria-hidden="true"></span>
+        <button class="nav-link" id="btn-theme">Light mode</button>
       </nav>
     </div>
   </header>
@@ -45,15 +43,15 @@
 
   <aside id="coach-toast" class="coach-toast" hidden aria-live="polite">
     <div id="coach-toast-text"></div>
-    <button class="btn btn-sm btn-ghost" id="btn-dismiss-coach" aria-label="Dismiss tip">✕</button>
+    <button class="nav-link" id="btn-dismiss-coach" aria-label="Dismiss tip">✕</button>
   </aside>
 
   <!-- 1994 Credits & Provenance Dialog -->
   <dialog id="credits-dialog" class="app-dialog" aria-labelledby="credits-title">
     <div class="dialog-head">
-      <h2 id="credits-title">1994 Credits &amp; UCL MSc Provenance</h2>
+      <h2 id="credits-title">1994 credits and UCL MSc provenance</h2>
       <form method="dialog">
-        <button class="btn btn-sm btn-ghost" aria-label="Close credits">✕ Close</button>
+        <button class="nav-link" aria-label="Close credits">✕ Close</button>
       </form>
     </div>
     <div class="dialog-body" id="credits-content"></div>
@@ -62,67 +60,65 @@
   <!-- L1 Greek Interference & HVPT Theory Dialog -->
   <dialog id="theory-dialog" class="app-dialog" aria-labelledby="theory-title">
     <div class="dialog-head">
-      <h2 id="theory-title">Mother Tongue (L1) Interference &amp; HVPT Theory</h2>
+      <h2 id="theory-title">Mother tongue (L1) interference and HVPT theory</h2>
       <form method="dialog">
-        <button class="btn btn-sm btn-ghost" aria-label="Close theory guide">✕ Close</button>
+        <button class="nav-link" aria-label="Close theory guide">✕ Close</button>
       </form>
     </div>
     <div class="dialog-body">
-      <p style="margin:0;">
+      <p class="prose-block">
         Adult L2 learners perceive foreign speech through the phonological grid of their native language (L1).
         Modern Greek has a symmetrical <strong>5-vowel system (/i, e, a, o, u/)</strong> and <strong>15 consonants</strong>,
         whereas Southern British English (RP) has <strong>20 vowels and 24 consonants</strong>.
       </p>
 
-      <div class="interference-box is-trap">
-        <h4>1. Single-Category Merger: Why Greek Merges "Sea" and "She" (PAM-L2)</h4>
+      <section class="dialog-section is-trap">
+        <h3>1. Single-category merger: why Greek merges "sea" and "she" (PAM-L2)</h3>
         <p>
           Standard Modern Greek has no postalveolar /ʃ/. Because Greek /s/ has no postalveolar competitor,
-          it is articulated as a retracted [s̠] with a spectral peak around 4.2–5.5 kHz—sitting right in the
+          it is articulated as a retracted [s̠] with a spectral peak around 4.2–5.5 kHz, sitting right in the
           acoustic middle between sharp English /s/ (6–8 kHz) and lip-rounded /ʃ/ (2.5–3.8 kHz).
           Both English sounds fall inside one Greek perceptual magnet.
         </p>
-      </div>
+      </section>
 
-      <div class="interference-box">
-        <h4>2. Vowel Space Starvation &amp; "Empty Center"</h4>
+      <section class="dialog-section">
+        <h3>2. Vowel space starvation and the "empty center"</h3>
         <p>
           Greek has no mid-central vowels (/ɜː, ə/) and no /ʌ/ (its only central vowel is open /a/),
           and lacks tense/lax pairs (/ɪ–iː/, /ʊ–uː/) and open-front /æ/.
           English /ɜː/ ("bird") scatters toward Greek /e, o, a/, while /æ, ʌ, ɑː/ crowd into Greek /a/.
         </p>
-      </div>
+      </section>
 
-      <div class="interference-box is-tip">
-        <h4>3. How This Modern Studio Breaks L1 Magnets (SLM-r &amp; HVPT)</h4>
-        <p>
-          <strong>Cross-Token Testing:</strong> Uses alternate 1994 recordings (*B.WAV, *C.WAV) so you learn
-          abstract phoneme categories rather than memorizing one audio clip.<br />
-          <strong>Immediate Contrastive Replay:</strong> Mistakes trigger side-by-side playback within echoic memory.<br />
-          <strong>Spectral Biofeedback:</strong> Real-time FFT &amp; spectral centroid metering lets your eyes see
-          acoustic cues (like 3 kHz vs. 7 kHz sibilants) while your ear recalibrates.
-        </p>
-      </div>
+      <section class="dialog-section is-tip">
+        <h3>3. How this studio breaks L1 magnets (SLM-r and HVPT)</h3>
+        <ul class="dialog-list">
+          <li><strong>Cross-token testing:</strong> Uses alternate 1994 recordings (*B.WAV, *C.WAV) so you learn abstract phoneme categories rather than memorizing one audio clip.</li>
+          <li><strong>Immediate contrastive replay:</strong> Mistakes trigger side-by-side playback within echoic memory.</li>
+          <li><strong>Spectral biofeedback:</strong> Real-time FFT and spectral centroid metering let your eyes inspect acoustic cues (such as 3 kHz vs. 7 kHz sibilants) while your ear recalibrates.</li>
+        </ul>
+      </section>
 
-      <div class="interference-box">
-        <h4>4. Transcription Convention</h4>
+      <section class="dialog-section">
+        <h3>4. Transcription convention</h3>
         <p>
           Transcriptions follow the standard British dictionary convention (J. C. Wells,
           <em>Longman Pronunciation Dictionary</em>; Jones &amp; Roach, <em>Cambridge English Pronouncing Dictionary</em>):
           <code>/e/</code> = DRESS (<em>bed</em>), <code>/eə/</code> = SQUARE (<em>chair</em>).
         </p>
-      </div>
+      </section>
     </div>
   </dialog>
 
   <!-- Confusion Matrix & Progress Dialog -->
   <dialog id="stats-dialog" class="app-dialog" aria-labelledby="stats-title">
     <div class="dialog-head">
-      <h2 id="stats-title">Perceptual Confusion Matrix &amp; Progress</h2>
-      <div style="display:flex; gap:0.5rem;">
-        <button class="btn btn-sm" id="btn-reset-stats">Reset Stats</button>
+      <h2 id="stats-title">Perceptual confusion matrix and progress</h2>
+      <div class="dialog-head-actions">
+        <button class="nav-link" id="btn-reset-stats">Reset stats</button>
         <form method="dialog">
-          <button class="btn btn-sm btn-ghost" aria-label="Close stats">✕ Close</button>
+          <button class="nav-link" aria-label="Close stats">✕ Close</button>
         </form>
       </div>
     </div>
@@ -132,23 +128,23 @@
   <!-- Help Dialog -->
   <dialog id="help-dialog" class="app-dialog" aria-labelledby="help-title">
     <div class="dialog-head">
-      <h2 id="help-title">How to Use This Studio</h2>
+      <h2 id="help-title">How to use this studio</h2>
       <form method="dialog">
-        <button class="btn btn-sm btn-ghost" aria-label="Close help">✕ Close</button>
+        <button class="nav-link" aria-label="Close help">✕ Close</button>
       </form>
     </div>
     <div class="dialog-body">
-      <p style="margin:0;">
+      <p class="prose-block">
         In the original 1994 ToolBook 3 guide: <em>"Click on any WORD button to listen to it or on a PLUS (+) button to hear a pair of words. Try to repeat what you are hearing."</em>
       </p>
-      <ul style="margin:0; padding-left:1.25rem; display:grid; gap:0.4rem; font-size:0.9rem;">
-        <li><strong>1. Explore &amp; Contrast:</strong> Listen to individual words, click <strong>+</strong> for immediate minimal-pair playback, and inspect <em>Token B / Token C</em> alternate recordings where available.</li>
-        <li><strong>2. Identification Test:</strong> Hear a target word and click the matching word (shortcuts: <kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>, and <kbd>R</kbd> to replay).</li>
-        <li><strong>3. AX Same / Different:</strong> Judge whether two tokens belong to the same phonemic word or contrasting words (shortcuts: <kbd>1</kbd>/<kbd>S</kbd> for Same, <kbd>2</kbd>/<kbd>D</kbd> for Different).</li>
-        <li><strong>4. Record &amp; Compare:</strong> Record your own pronunciation and compare it on the Spectrum Meter and via sequential <em>Native → You → Native</em> playback.</li>
+      <ul class="dialog-list">
+        <li><strong>Explore &amp; contrast:</strong> Listen to individual words, click <strong>+</strong> for immediate minimal-pair playback, and inspect <em>Token B / Token C</em> alternate recordings where available.</li>
+        <li><strong>Identification test:</strong> Hear a target word and click the matching word (shortcuts: <kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>, and <kbd>R</kbd> to replay).</li>
+        <li><strong>AX same / different:</strong> Judge whether two tokens belong to the same phonemic word or contrasting words (shortcuts: <kbd>1</kbd>/<kbd>S</kbd> for Same, <kbd>2</kbd>/<kbd>D</kbd> for Different).</li>
+        <li><strong>Record &amp; compare:</strong> Record your own pronunciation and compare it on the spectrum meter and via sequential <em>Native → You → Native</em> playback.</li>
       </ul>
-      <div>
-        <button class="btn btn-sm" id="btn-play-okey">▶ Play 1994 Help "OK" Button (OKEY.WAV)</button>
+      <div class="dialog-footer-action">
+        <button class="btn" id="btn-play-okey">▶ Play 1994 help "OK" audio (OKEY.WAV)</button>
       </div>
     </div>
   </dialog>
@@ -156,4 +152,3 @@
   <script type="module" src="./js/app.js"></script>
 </body>
 </html>
-
