@@ -46,11 +46,13 @@ class SoundsEnglishApp {
   }
 
   cacheDom() {
+    this.header = document.getElementById('app-header');
     this.appMain = document.getElementById('app-main');
     this.liveRegion = document.getElementById('live-announcer');
     this.coachToast = document.getElementById('coach-toast');
     this.coachText = document.getElementById('coach-toast-text');
     this.themeBtn = document.getElementById('btn-theme');
+    this.glossaryNavBtn = document.getElementById('btn-open-glossary');
 
     this.dialogs = {
       credits: document.getElementById('credits-dialog'),
@@ -121,11 +123,23 @@ class SoundsEnglishApp {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem('setm-theme', theme);
     if (this.themeBtn) {
-      this.themeBtn.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+      this.themeBtn.textContent = theme === 'dark' ? 'Light mode' : 'Dark mode';
+    }
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeMeta) {
+      themeMeta.setAttribute('content', theme === 'dark' ? '#0a0f18' : '#f8fafc');
     }
   }
 
   bindGlobalEvents() {
+    const syncHeaderScroll = () => {
+      if (this.header) {
+        this.header.classList.toggle('is-scrolled', window.scrollY > 8);
+      }
+    };
+    window.addEventListener('scroll', syncHeaderScroll, { passive: true });
+    syncHeaderScroll();
+
     document.getElementById('btn-home')?.addEventListener('click', () => {
       this.navigate(() => {
         this.state.view = 'contents';
@@ -230,10 +244,10 @@ class SoundsEnglishApp {
       if (!this.coachToast || !this.coachText) return;
       if (this.state.view === 'contents') {
         this.coachText.textContent =
-          'Tip: Click ▶ Preview on any Unit card to hear the contrast, or open Unit 1 (/s/ vs. /ʃ/) to try live spectral biofeedback.';
+          'Tip: Play sip and ship above to hear the /s/ vs. /ʃ/ contrast, or open Unit 1 for live spectral feedback.';
       } else {
         this.coachText.textContent =
-          'Tip: Click any word to hear it, click + to hear the minimal pair back-to-back, or switch to Identification Test to check your perception.';
+          'Tip: Click any word to hear it, click + to hear the minimal pair back-to-back, or switch to Identification test.';
       }
       this.coachToast.hidden = false;
     }, 30000);
@@ -263,10 +277,10 @@ class SoundsEnglishApp {
     const creditsContainer = document.getElementById('credits-content');
     if (creditsContainer) {
       creditsContainer.innerHTML = `
-        <p><strong>${CREDITS_1994.title}</strong> — <em>${CREDITS_1994.subtitle}</em></p>
-        <p>Originally authored in <strong>ToolBook 3.0 (${CREDITS_1994.year})</strong> by <strong>${CREDITS_1994.author}</strong> for the <strong>${CREDITS_1994.degree}</strong>.</p>
+        <p class="prose-block"><strong>${CREDITS_1994.title}</strong>: <em>${CREDITS_1994.subtitle}</em></p>
+        <p class="prose-block">Originally authored in <strong>ToolBook 3.0 (${CREDITS_1994.year})</strong> by <strong>${CREDITS_1994.author}</strong> for the <strong>${CREDITS_1994.degree}</strong>.</p>
         <blockquote class="credits-quote">${CREDITS_1994.creditsText}</blockquote>
-        <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">${CREDITS_1994.copyrightNote}</p>
+        <p class="credits-note">${CREDITS_1994.copyrightNote}</p>
       `;
     }
 
@@ -294,21 +308,21 @@ class SoundsEnglishApp {
       if (!s || (s.identifyAttempts === 0 && s.axAttempts === 0)) {
         return `
           <tr>
-            <td><strong>${u.badge}</strong> <span style="color:var(--text-secondary)">${u.title}</span></td>
-            <td class="mono">—</td>
-            <td class="mono">—</td>
-            <td class="mono">—</td>
-            <td style="color:var(--text-muted)">Not practiced yet</td>
+            <td><strong>${u.badge}</strong> <span class="text-secondary">${u.title}</span></td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td class="text-muted">Not practiced yet</td>
           </tr>
         `;
       }
       const idAcc = s.identifyAttempts
         ? `${Math.round((s.identifyCorrect / s.identifyAttempts) * 100)}% (${s.identifyCorrect}/${s.identifyAttempts})`
-        : '—';
+        : '-';
       const axAcc = s.axAttempts
         ? `${Math.round((s.axCorrect / s.axAttempts) * 100)}% (${s.axCorrect}/${s.axAttempts})`
-        : '—';
-      const avgRt = s.rtCount ? `${Math.round(s.totalRtMs / s.rtCount)} ms` : '—';
+        : '-';
+      const avgRt = s.rtCount ? `${Math.round(s.totalRtMs / s.rtCount)} ms` : '-';
       const topConf = Object.entries(s.confusions || {})
         .sort((a, b) => b[1] - a[1])
         .slice(0, 2)
@@ -317,35 +331,35 @@ class SoundsEnglishApp {
 
       return `
         <tr>
-          <td><strong>${u.badge}</strong> <span style="color:var(--text-secondary)">${u.title}</span></td>
-          <td class="mono">${idAcc}</td>
-          <td class="mono">${axAcc}</td>
-          <td class="mono">${avgRt}</td>
+          <td><strong>${u.badge}</strong> <span class="text-secondary">${u.title}</span></td>
+          <td>${idAcc}</td>
+          <td>${axAcc}</td>
+          <td>${avgRt}</td>
           <td>${topConf || 'None'}</td>
         </tr>
       `;
     }).join('');
 
     body.innerHTML = `
-      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
-        <div class="interference-box" style="flex:1">
-          <h4>Total Trials</h4>
-          <p class="mono" style="font-size:1.3rem; color:var(--text-primary); font-weight:700;">${totalTrials}</p>
+      <div class="stats-summary">
+        <div class="stats-summary-item">
+          <span>Total trials</span>
+          <strong>${totalTrials}</strong>
         </div>
-        <div class="interference-box" style="flex:1">
-          <h4>Overall Accuracy</h4>
-          <p class="mono" style="font-size:1.3rem; color:var(--accent-success); font-weight:700;">${totalTrials ? overallAcc + '%' : '—'}</p>
+        <div class="stats-summary-item is-success">
+          <span>Overall accuracy</span>
+          <strong>${totalTrials ? overallAcc + '%' : '-'}</strong>
         </div>
       </div>
-      <div style="overflow-x:auto;">
+      <div class="stats-table-wrap">
         <table class="stats-table">
           <thead>
             <tr>
               <th>Unit</th>
               <th>Identification</th>
-              <th>AX Discrimination</th>
+              <th>AX discrimination</th>
               <th>Mean RT</th>
-              <th>Top L1 Confusions</th>
+              <th>Top L1 confusions</th>
             </tr>
           </thead>
           <tbody>${rowsHtml}</tbody>
@@ -355,6 +369,14 @@ class SoundsEnglishApp {
   }
 
   render() {
+    if (this.glossaryNavBtn) {
+      if (this.state.view === 'glossary') {
+        this.glossaryNavBtn.setAttribute('aria-current', 'page');
+      } else {
+        this.glossaryNavBtn.removeAttribute('aria-current');
+      }
+    }
+
     if (this.state.view === 'contents') {
       this.renderContentsView();
     } else if (this.state.view === 'glossary') {
@@ -436,35 +458,34 @@ class SoundsEnglishApp {
       (v) => `<option value="${v.id}" ${v.id === activeVoice ? 'selected' : ''}>${v.label}</option>`
     ).join('');
 
-    const cardsHtml = filtered
+    const entriesHtml = filtered
       .map((e, idx) => {
         const isAdv = ['B1', 'B2', 'C1'].includes(e.level);
-        const unitChips = e.units
+        const unitLinks = e.units
           .map(
             (u) =>
-              `<button class="token-chip" data-jump-unit="${u.id}" title="Open ${u.badge}">${u.badge}</button>`
+              `<button class="token-trigger" data-jump-unit="${u.id}" title="Open ${u.badge}">${u.badge}</button>`
           )
           .join('');
         return `
-          <article class="glossary-card">
-            <div class="glossary-card-top">
+          <article class="glossary-entry">
+            <div class="glossary-entry-top">
               <div class="glossary-word-title">
                 <h3>${e.word}</h3>
                 <span class="glossary-ipa">${e.ipa}</span>
-                <span class="glossary-pos">${e.pos}</span>
               </div>
-              <span class="level-badge ${isAdv ? 'is-advanced' : ''}">${e.level}</span>
+              <span class="glossary-meta ${isAdv ? 'is-advanced' : ''}">${e.pos} · ${e.level}</span>
             </div>
             <p class="glossary-def">${e.definition}</p>
             <p class="glossary-example">“${e.example}”</p>
-            <div class="glossary-card-footer">
-              <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-                <button class="btn btn-sm" data-gloss-wav="${e.wav}" title="Play 1994 studio recording">▶ Word</button>
-                <button class="btn btn-sm btn-primary" data-gloss-tts="${idx}" title="Read definition & example with Gemini TTS">
-                  🔊 Read Def &amp; Example
+            <div class="glossary-entry-footer">
+              <div class="glossary-audio-actions">
+                <button class="action-link" data-gloss-wav="${e.wav}" title="Play 1994 studio recording">▶ Word</button>
+                <button class="action-link is-accent" data-gloss-tts="${idx}" title="Read definition and example aloud">
+                  🔊 Read aloud
                 </button>
               </div>
-              <div class="glossary-unit-links">${unitChips}</div>
+              <div class="glossary-unit-links">${unitLinks}</div>
             </div>
           </article>
         `;
@@ -473,18 +494,18 @@ class SoundsEnglishApp {
 
     this.appMain.innerHTML = `
       <div class="studio-topbar">
-        <button class="btn btn-sm" id="btn-gloss-back">← Contents</button>
-        <span style="font-size:0.85rem; color:var(--text-secondary);">
+        <button class="nav-link" id="btn-gloss-back">← Contents</button>
+        <span class="text-secondary" style="font-size: var(--text-sm);">
           Showing <strong>${filtered.length}</strong> of <strong>${this.glossaryEntries.length}</strong> words
         </span>
       </div>
 
-      <section class="glossary-header-card">
+      <section class="glossary-header">
         <div>
-          <h1 class="studio-title" style="margin-bottom:0.3rem;">Alphabetical Glossary (A–Z)</h1>
-          <p style="margin:0; font-size:0.9rem; color:var(--text-secondary);">
-            Every word from all 14 units with a simple English definition, example sentence, CEFR level,
-            original 1994 pronunciation audio, and <strong>Gemini TTS</strong> voice reading.
+          <h1 class="studio-title">Alphabetical glossary (A–Z)</h1>
+          <p class="glossary-lead">
+            Every word from all 14 units with a plain English definition, example sentence, CEFR level,
+            original 1994 studio audio, and Gemini TTS voice reading.
           </p>
         </div>
 
@@ -493,21 +514,21 @@ class SoundsEnglishApp {
             type="search"
             id="glossary-search-input"
             class="glossary-search"
-            placeholder="Search word, meaning, or unit (e.g. etch, wits, Unit 1)…"
+            placeholder="Search word, meaning, or unit (e.g. etch, wits, Unit 1)..."
             value="${this.state.glossaryQuery.replace(/"/g, '&quot;')}"
           />
-          <select id="glossary-level-select" class="btn btn-sm" aria-label="Filter by CEFR level">
-            <option value="ALL" ${levelFilter === 'ALL' ? 'selected' : ''}>All Levels (A1–C1)</option>
-            <option value="B1_C1" ${levelFilter === 'B1_C1' ? 'selected' : ''}>B1–C1 Vocabulary Only</option>
-            <option value="A1_A2" ${levelFilter === 'A1_A2' ? 'selected' : ''}>A1–A2 Core Words</option>
+          <select id="glossary-level-select" class="studio-select" aria-label="Filter by CEFR level">
+            <option value="ALL" ${levelFilter === 'ALL' ? 'selected' : ''}>All levels (A1–C1)</option>
+            <option value="B1_C1" ${levelFilter === 'B1_C1' ? 'selected' : ''}>B1–C1 vocabulary only</option>
+            <option value="A1_A2" ${levelFilter === 'A1_A2' ? 'selected' : ''}>A1–A2 core words</option>
           </select>
         </div>
 
         <details class="tts-settings-details" ${!hasApiKey ? 'open' : ''}>
           <summary>
-            Gemini TTS Voice Settings · Status:
+            Gemini TTS voice settings · Status:
             <span id="tts-status-label" style="color:${hasApiKey ? 'var(--accent-success)' : 'var(--accent-warn)'};">
-              ${hasApiKey ? `Gemini TTS Ready (${activeVoice})` : 'Browser Fallback (add Gemini API key for Gemini TTS)'}
+              ${hasApiKey ? `Gemini TTS ready (${activeVoice})` : 'Browser fallback (add Gemini API key for Gemini TTS)'}
             </span>
           </summary>
           <div class="tts-settings-body">
@@ -515,19 +536,19 @@ class SoundsEnglishApp {
               type="password"
               id="gemini-key-input"
               class="glossary-search"
-              style="max-width:340px;"
-              placeholder="Paste Gemini API key (saved locally in browser)…"
+              style="max-width:360px;"
+              placeholder="Paste Gemini API key (saved locally)..."
               value="${this.tts.getApiKey()}"
             />
-            <select id="gemini-voice-select" class="btn btn-sm" aria-label="Gemini TTS Voice">
+            <select id="gemini-voice-select" class="studio-select" aria-label="Gemini TTS voice">
               ${voiceOptionsHtml}
             </select>
-            <button class="btn btn-sm btn-primary" id="btn-save-gemini">Save Settings</button>
-            <button class="btn btn-sm" id="btn-clear-gemini">Clear Key</button>
+            <button class="btn btn-primary" id="btn-save-gemini">Save settings</button>
+            <button class="btn" id="btn-clear-gemini">Clear key</button>
           </div>
-          <p style="margin:0.55rem 0 0; font-size:0.78rem; color:var(--text-secondary);">
+          <p class="tts-note">
             Uses <code>gemini-2.5-flash-preview-tts</code> (or pre-generated <code>audio/glossary/*.wav</code> if present).
-            Your API key stays only in your browser’s <code>localStorage</code> and is sent directly to Google’s Gemini API.
+            Your API key stays only in your browser's <code>localStorage</code> and is sent directly to Google's Gemini API.
           </p>
         </details>
       </section>
@@ -537,7 +558,7 @@ class SoundsEnglishApp {
       </div>
 
       <div class="glossary-grid">
-        ${cardsHtml || '<p style="color:var(--text-secondary);">No matching words found.</p>'}
+        ${entriesHtml || '<p class="text-secondary">No matching words found.</p>'}
       </div>
     `;
 
@@ -599,7 +620,7 @@ class SoundsEnglishApp {
         if (!entry) return;
         const origLabel = btn.textContent;
         btn.classList.add('is-playing');
-        btn.textContent = '⏳ Speaking…';
+        btn.textContent = 'Speaking...';
         try {
           const result = await this.tts.speakEntry(entry);
           const statusEl = document.getElementById('tts-status-label');
@@ -632,36 +653,26 @@ class SoundsEnglishApp {
   }
 
   renderContentsView() {
-    const totalPairs = UNITS.reduce(
-      (acc, u) => acc + u.groups.reduce((gAcc, g) => gAcc + g.items.length, 0),
-      0
-    );
-    const practicedCount = Object.values(this.state.stats.units).filter(
-      (s) => s.identifyAttempts + s.axAttempts > 0
-    ).length;
-    const overallAcc =
-      this.state.stats.totalTrials > 0
-        ? `${Math.round((this.state.stats.totalCorrect / this.state.stats.totalTrials) * 100)}%`
-        : '—';
-
     const sectionsHtml = CATEGORIES.map((cat) => {
       const catUnits = UNITS.filter((u) => u.category === cat.id);
-      const cardsHtml = catUnits
+      const cellsHtml = catUnits
         .map((u) => {
           const acc = this.getUnitAccuracyText(u.id);
           return `
-            <article class="unit-card" data-unit-id="${u.id}">
-              <div class="unit-card-top">
-                <span class="unit-badge ${u.restored ? 'is-restored' : ''}">${u.badge}</span>
-                ${acc ? `<span class="unit-accuracy-pill" title="Your accuracy">${acc}</span>` : ''}
+            <article class="unit-cell" data-unit-id="${u.id}">
+              <div class="unit-cell-meta">
+                <span class="unit-label ${u.restored ? 'is-restored' : ''}">
+                  ${u.badge}${u.restored ? ' · Restored' : ''}
+                </span>
+                ${acc ? `<span class="unit-accuracy" title="Your accuracy">${acc}</span>` : ''}
               </div>
               <h3 class="unit-ipa">${u.title}</h3>
               <p class="unit-exemplar">${u.subtitle}</p>
               <p class="unit-pam">${u.pamType}</p>
-              <div class="unit-card-actions">
-                <button class="btn btn-primary btn-sm" data-open-unit="${u.id}">Open Studio</button>
+              <div class="unit-cell-actions">
+                <button class="action-link is-accent" data-open-unit="${u.id}">Open studio →</button>
                 <button
-                  class="btn btn-sm"
+                  class="action-link"
                   data-preview-unit="${u.id}"
                   title="Listen to unit introduction"
                   aria-label="Listen to ${u.badge} preview"
@@ -678,35 +689,87 @@ class SoundsEnglishApp {
             <h2>${cat.title}</h2>
             <p>${cat.description}</p>
           </div>
-          <div class="unit-grid">${cardsHtml}</div>
+          <div class="unit-grid">${cellsHtml}</div>
         </section>
       `;
     }).join('');
 
     this.appMain.innerHTML = `
-      <section class="hero-card">
-        <div>
-          <div class="hero-eyebrow">1994 UCL MSc Speech &amp; Hearing Sciences · Modernized Web Studio</div>
-          <h1 class="hero-title">Sounds English to Me</h1>
-          <p class="hero-desc">
-            Minimal-pair &amp; High Variability Phonetic Training (HVPT) targeting Greek L1 interference in English
-            consonants, sibilants, weak syllables, and vowel space. Restores all 12 original ToolBook 3 units,
-            unlocks the unlinked Unit 13 (/ʊ/ vs. /uː/) and multi-token (*B/*C) recordings, and adds live acoustic
-            spectral biofeedback.
+      <section class="studio-opening" aria-labelledby="opening-title">
+        <div class="opening-lead">
+          <h1 id="opening-title" class="opening-title">Train English contrasts that Greek merges</h1>
+          <p class="opening-copy">
+            Fourteen minimal-pair units from the 1994 UCL Speech &amp; Hearing Sciences corpus, with cross-token drills and live spectral feedback.
           </p>
-          <div class="hero-controls">
-            <button class="btn btn-primary" id="btn-hero-start-u1">Start with Unit 1 (/s/ vs. /ʃ/)</button>
+        </div>
+
+        <div class="opening-workbench" aria-label="Interactive /s/ vs. /ʃ/ contrast preview">
+          <div class="opening-preview-meta">
+            <span class="opening-preview-label">Preview /s/ vs. /ʃ/ from Unit 1</span>
+            <span class="opening-preview-cue">Alveolar 6–8.5 kHz vs. postalveolar 2.5–3.8 kHz</span>
+          </div>
+
+          <div class="opening-preview-row">
+            <div class="opening-pair-group" role="group" aria-label="Play sip and ship contrast">
+              <button class="preview-word-btn" id="btn-preview-sip" data-preview-wav="SIP.WAV">
+                <span class="preview-word-text">sip</span>
+                <span class="preview-word-ipa">/sɪp/</span>
+              </button>
+              <button
+                class="plus-contrast-btn"
+                id="btn-preview-plus"
+                aria-label="Play sip then ship contrast"
+                title="Hear sip → ship contrast"
+              >+</button>
+              <button class="preview-word-btn" id="btn-preview-ship" data-preview-wav="SHIP.WAV">
+                <span class="preview-word-text">ship</span>
+                <span class="preview-word-ipa">/ʃɪp/</span>
+              </button>
+            </div>
+
+            <button class="btn btn-primary" id="btn-hero-start-u1">Open Unit 1</button>
           </div>
         </div>
-        <aside class="hero-stats-box" aria-label="Course progress summary">
-          <div class="stat-line"><span>Phonemic Modules</span><strong>${UNITS.length} Units</strong></div>
-          <div class="stat-line"><span>Minimal Contrasts</span><strong>${totalPairs} Sets</strong></div>
-          <div class="stat-line"><span>Units Practiced</span><strong>${practicedCount} / ${UNITS.length}</strong></div>
-          <div class="stat-line"><span>Overall Accuracy</span><strong>${overallAcc}</strong></div>
-        </aside>
       </section>
       ${sectionsHtml}
     `;
+
+    // Preload opening contrast preview tokens
+    this.audio.preload(['SIP.WAV', 'SHIP.WAV']);
+
+    const sipBtn = document.getElementById('btn-preview-sip');
+    const shipBtn = document.getElementById('btn-preview-ship');
+    const plusBtn = document.getElementById('btn-preview-plus');
+    const previewBtns = [sipBtn, shipBtn].filter(Boolean);
+
+    previewBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        previewBtns.forEach((el) => el.classList.remove('is-playing'));
+        plusBtn?.classList.remove('is-playing');
+        btn.classList.add('is-playing');
+        this.audio.playFile(btn.dataset.previewWav).finally(() => {
+          btn.classList.remove('is-playing');
+        });
+      });
+    });
+
+    plusBtn?.addEventListener('click', () => {
+      previewBtns.forEach((el) => el.classList.remove('is-playing'));
+      plusBtn.classList.add('is-playing');
+      this.audio
+        .playSequence(['SIP.WAV', 'SHIP.WAV'], 230, {
+          onStepStart: (i) => {
+            previewBtns.forEach((el, idx) => el.classList.toggle('is-playing', idx === i));
+          },
+          onStepEnd: () => {
+            previewBtns.forEach((el) => el.classList.remove('is-playing'));
+          },
+        })
+        .finally(() => {
+          plusBtn.classList.remove('is-playing');
+          previewBtns.forEach((el) => el.classList.remove('is-playing'));
+        });
+    });
 
     document.getElementById('btn-hero-start-u1')?.addEventListener('click', () => {
       this.openUnit('unit1');
@@ -765,23 +828,19 @@ class SoundsEnglishApp {
       .map(
         (p, idx) => `
           <button
-            class="phoneme-chip"
+            class="phoneme-trigger"
             data-phoneme-audio="${p.audio}"
             popovertarget="cue-popover-${idx}"
-            title="Play ${p.ipa} reference & view articulation"
+            title="Play ${p.ipa} reference and view articulation"
           >
             <span class="chip-ipa">${p.ipa}</span>
             <span>${p.label}</span>
             <span class="chip-hz">${p.frequencyHint}</span>
           </button>
           <div id="cue-popover-${idx}" popover="auto" class="cue-popover">
-            <h4 style="margin:0 0 0.35rem; font-family:var(--font-mono); color:var(--accent-primary);">
-              ${p.ipa} — ${p.label}
-            </h4>
-            <p style="margin:0 0 0.45rem; font-size:0.88rem;">${p.articulation}</p>
-            <p style="margin:0; font-size:0.8rem; color:var(--text-secondary);">
-              Acoustic cue: <strong>${p.frequencyHint}</strong>
-            </p>
+            <h4>${p.ipa}: ${p.label}</h4>
+            <p>${p.articulation}</p>
+            <p class="popover-cue">Acoustic cue: <strong>${p.frequencyHint}</strong></p>
           </div>
         `
       )
@@ -790,40 +849,40 @@ class SoundsEnglishApp {
     this.appMain.innerHTML = `
       <div class="studio-topbar">
         <div class="studio-nav-group">
-          <button class="btn btn-sm" id="btn-back-contents">← Contents</button>
-          <button class="btn btn-sm" id="btn-prev-unit" ${!prevUnit ? 'disabled' : ''}>
+          <button class="nav-link" id="btn-back-contents">← Contents</button>
+          <button class="nav-link" id="btn-prev-unit" ${!prevUnit ? 'disabled' : ''}>
             ‹ ${prevUnit ? prevUnit.badge : 'Start'}
           </button>
-          <button class="btn btn-sm" id="btn-next-unit" ${!nextUnit ? 'disabled' : ''}>
+          <button class="nav-link" id="btn-next-unit" ${!nextUnit ? 'disabled' : ''}>
             ${nextUnit ? nextUnit.badge : 'End'} ›
           </button>
         </div>
-        <button class="btn btn-sm" id="btn-play-unit-banner">▶ Unit Audio (${unit.badge})</button>
+        <button class="action-link is-accent" id="btn-play-unit-banner">▶ Unit audio (${unit.badge})</button>
       </div>
 
-      <section class="studio-header-card">
-        <div class="studio-title-row">
-          <h1 class="studio-title">
-            <span class="unit-badge ${unit.restored ? 'is-restored' : ''}">${unit.badge}</span>
-            <span class="ipa-title">${unit.title}</span>
-            <span style="font-weight:400; font-size:1rem; color:var(--text-secondary);">(${unit.subtitle})</span>
-          </h1>
-          <span class="unit-pam">${unit.pamType}</span>
-        </div>
+      <section class="studio-header">
+        <h1 class="studio-title">
+          ${unit.badge}: <span class="ipa-title">${unit.title}</span>
+        </h1>
+        <p class="studio-subtitle-row">
+          <span>${unit.subtitle}</span>
+          <span>${unit.pamType}</span>
+          ${unit.restored ? '<span class="studio-restored-note">Restored from 1994 archive</span>' : ''}
+        </p>
 
-        <div class="phoneme-pills">${phonemesHtml}</div>
+        <div class="phoneme-strip">${phonemesHtml}</div>
 
-        <div class="interference-panel">
-          <div class="interference-box is-trap">
-            <h4>Greek L1 Interference</h4>
+        <div class="interference-grid">
+          <div class="interference-col is-trap">
+            <h4>Greek L1 interference</h4>
             <p>${unit.l1Interference.summary}</p>
           </div>
-          <div class="interference-box">
-            <h4>Acoustic Contrast Target</h4>
+          <div class="interference-col">
+            <h4>Acoustic contrast target</h4>
             <p>${unit.l1Interference.englishTarget}</p>
           </div>
-          <div class="interference-box is-tip">
-            <h4>Articulatory &amp; Listening Cue</h4>
+          <div class="interference-col is-tip">
+            <h4>Articulatory and listening cue</h4>
             <p>${unit.l1Interference.coachingTip}</p>
           </div>
         </div>
@@ -831,25 +890,25 @@ class SoundsEnglishApp {
 
       <div class="mode-tabs" role="tablist" aria-label="Practice modes">
         <button class="mode-tab" role="tab" data-mode="explore" aria-selected="${this.state.mode === 'explore'}">
-          1. Explore &amp; Contrast
+          Explore &amp; contrast
         </button>
         <button class="mode-tab" role="tab" data-mode="identify" aria-selected="${this.state.mode === 'identify'}">
-          2. Identification Test
+          Identification test
         </button>
         <button class="mode-tab" role="tab" data-mode="ax" aria-selected="${this.state.mode === 'ax'}">
-          3. AX Same / Different
+          AX same / different
         </button>
         <button class="mode-tab" role="tab" data-mode="record" aria-selected="${this.state.mode === 'record'}">
-          4. Record &amp; Compare
+          Record &amp; compare
         </button>
       </div>
 
       <div class="studio-workspace">
-        <section class="studio-panel" id="mode-panel"></section>
-        <aside class="studio-panel biofeedback-card" aria-label="Real-time acoustic visualizer">
+        <section class="studio-main-col" id="mode-panel"></section>
+        <aside class="biofeedback-panel" aria-label="Real-time acoustic visualizer">
           <div class="biofeedback-header">
-            <h3>Acoustic Spectrum &amp; Waveform</h3>
-            <span class="centroid-readout" id="centroid-readout">Centroid: — Hz</span>
+            <h3>Acoustic spectrum and waveform</h3>
+            <span class="centroid-readout" id="centroid-readout">Centroid: - Hz</span>
           </div>
           <canvas id="spectrum-canvas" class="spectrum-canvas" width="460" height="195"></canvas>
           <p class="biofeedback-caption" id="biofeedback-caption">
@@ -880,7 +939,7 @@ class SoundsEnglishApp {
       this.audio.playSequence(seq, 180);
     });
 
-    // Phoneme chips play sound as well as opening popover
+    // Phoneme triggers play sound as well as opening popover
     this.appMain.querySelectorAll('[data-phoneme-audio]').forEach((chip) => {
       chip.addEventListener('click', () => {
         this.audio.playFile(chip.dataset.phonemeAudio);
@@ -918,12 +977,12 @@ class SoundsEnglishApp {
       return 'Target zones: /ʃ/ peaks around 2.5–3.8 kHz; Greek retracted [s̠] traps near 4.2–5.5 kHz; English /s/ peaks above 6 kHz.';
     }
     if (mode === 'vowel') {
-      return 'Focused 0–4 kHz vowel formant window showing F1 (jaw openness) & F2 (tongue frontness) energy distribution.';
+      return 'Focused 0–4 kHz vowel formant window showing F1 (jaw openness) and F2 (tongue frontness) energy distribution.';
     }
     if (mode === 'vot') {
       return 'Watch the upper white waveform for silent stop-closure gaps and release bursts (VOT / aspiration).';
     }
-    return 'Compare nasal resonance energy vs. final /k/ release burst in the waveform & spectrum.';
+    return 'Compare nasal resonance energy vs. final /k/ release burst in the waveform and spectrum.';
   }
 
   renderActiveModePanel(unit) {
@@ -945,36 +1004,36 @@ class SoundsEnglishApp {
     const groups = unit.groups;
     const activeGroup = groups[this.state.groupIndex] || groups[0];
 
-    const subgroupPills =
+    const subgroupControl =
       groups.length > 1
-        ? `<div class="subgroup-pills">
+        ? `<div class="segmented-control" role="group" aria-label="Contrast subgroup">
             ${groups
               .map(
                 (g, i) => `
-                <button class="subgroup-pill" data-group-idx="${i}" aria-pressed="${i === this.state.groupIndex}">
+                <button class="segmented-btn" data-group-idx="${i}" aria-pressed="${i === this.state.groupIndex}">
                   ${g.label}
                 </button>`
               )
               .join('')}
           </div>`
-        : `<strong style="font-size:0.95rem;">${activeGroup.label}</strong>`;
+        : `<span class="subgroup-heading">${activeGroup.label}</span>`;
 
     const rowsHtml = activeGroup.items
       .map((item, rowIdx) => {
         const isTriplet = item.words.length > 2;
-        const wordCardsHtml = item.words
+        const wordSlotsHtml = item.words
           .map((w, wIdx) => {
             const altButtons = (w.altWavs || [])
               .map(
                 (altWav, aIdx) => `
-                  <button class="token-chip" data-wav="${altWav}" title="Alternate acoustic token (${altWav})">
+                  <button class="token-trigger" data-wav="${altWav}" title="Alternate acoustic token (${altWav})">
                     Token ${String.fromCharCode(66 + aIdx)}
                   </button>`
               )
               .join('');
 
             return `
-              <div class="word-card">
+              <div class="word-slot">
                 <button class="word-btn" data-wav="${w.wav}" id="word-${rowIdx}-${wIdx}">
                   <span class="word-text">${w.text}</span>
                   <span class="word-ipa">${w.ipa}</span>
@@ -995,8 +1054,8 @@ class SoundsEnglishApp {
         `;
 
         const inner = isTriplet
-          ? `${wordCardsHtml}${plusBtnHtml}`
-          : wordCardsHtml.replace('<!--plus-slot-->', plusBtnHtml);
+          ? `${wordSlotsHtml}${plusBtnHtml}`
+          : wordSlotsHtml.replace('<!--plus-slot-->', plusBtnHtml);
 
         return `<div class="pair-row ${isTriplet ? 'is-triplet' : ''}">${inner}</div>`;
       })
@@ -1004,18 +1063,18 @@ class SoundsEnglishApp {
 
     panel.innerHTML = `
       <div class="subgroup-bar">
-        ${subgroupPills}
-        <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-          ${activeGroup.contrastAudio ? '<button class="btn btn-sm" id="btn-contrast-audio">▶ Hear Contrast</button>' : ''}
-          <button class="btn btn-sm" id="btn-pair-drill">▶ Auto Pair Drill</button>
+        ${subgroupControl}
+        <div class="subgroup-actions">
+          ${activeGroup.contrastAudio ? '<button class="action-link" id="btn-contrast-audio">▶ Hear contrast</button>' : ''}
+          <button class="action-link is-accent" id="btn-pair-drill">▶ Auto pair drill</button>
         </div>
       </div>
       <div class="pairs-list">${rowsHtml}</div>
     `;
 
-    panel.querySelectorAll('[data-group-idx]').forEach((pill) => {
-      pill.addEventListener('click', () => {
-        this.state.groupIndex = Number(pill.dataset.groupIdx);
+    panel.querySelectorAll('[data-group-idx]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.state.groupIndex = Number(btn.dataset.groupIdx);
         const selectedGroup = groups[this.state.groupIndex];
         if (selectedGroup?.contrastAudio) {
           this.audio.playFile(selectedGroup.contrastAudio);
@@ -1197,7 +1256,7 @@ class SoundsEnglishApp {
           <button class="quiz-option-btn" data-choice-idx="${idx}" ${stateAttr} ${q.answered ? 'disabled' : ''}>
             <span class="opt-word">${w.text}</span>
             <span class="opt-ipa">${w.ipa}</span>
-            <span style="font-size:0.72rem; color:var(--text-muted);">Key ${idx + 1}</span>
+            <span class="opt-key">Key ${idx + 1}</span>
           </button>
         `;
       })
@@ -1210,14 +1269,14 @@ class SoundsEnglishApp {
       feedbackHtml = `
         <div class="feedback-banner ${isRight ? 'is-correct' : 'is-wrong'}">
           <div>
-            <strong>${isRight ? 'Correct!' : `You clicked "${q.options[q.selectedIdx].text}" — target was "${q.targetWord.text}".`}</strong>
-            <div style="font-size:0.82rem; color:var(--text-secondary);">
-              ${isRight ? 'Nice categorical discrimination.' : 'Listen to the pair side-by-side right now to recalibrate the contrast.'}
+            <strong>${isRight ? 'Correct.' : `You clicked "${q.options[q.selectedIdx].text}". Target was "${q.targetWord.text}".`}</strong>
+            <div class="feedback-sub">
+              ${isRight ? 'Accurate categorical discrimination.' : 'Listen to the pair side-by-side now to recalibrate the contrast.'}
             </div>
           </div>
-          <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
-            <button class="btn btn-sm" id="btn-id-contrast">▶ Hear Contrast (${q.options.map((w) => w.text).join(' ↔ ')})</button>
-            <button class="btn btn-primary btn-sm" id="btn-id-next">Next Question →</button>
+          <div class="feedback-actions">
+            <button class="btn" id="btn-id-contrast">▶ Hear contrast (${q.options.map((w) => w.text).join(' ↔ ')})</button>
+            <button class="btn btn-primary" id="btn-id-next">Next question →</button>
           </div>
         </div>
       `;
@@ -1234,15 +1293,15 @@ class SoundsEnglishApp {
     panel.innerHTML = `
       <div class="quiz-stage">
         <div class="quiz-meta-bar">
-          <span>Score: <span class="mono">${q.score} / ${q.total}</span> (${q.total ? acc + '%' : '—'})</span>
-          <span>Streak: <span class="mono">${q.streak}</span></span>
-          <span>Source: <span class="mono">${q.tokenLabel}${q.isAltToken ? ' (Cross-Token HVPT)' : ''}</span></span>
+          <span>Score: <strong>${q.score} / ${q.total}</strong> (${q.total ? acc + '%' : '-'})</span>
+          <span>Streak: <strong>${q.streak}</strong></span>
+          <span>Source: <strong>${q.tokenLabel}${q.isAltToken ? ' (cross-token HVPT)' : ''}</strong></span>
         </div>
 
-        <div class="quiz-prompt-box">
-          <h3>Now click on the word you heard</h3>
+        <div class="quiz-prompt-block">
+          <h3>Click the word you heard</h3>
           <p>Press <kbd>R</kbd> to replay, or <kbd>1</kbd>–<kbd>${q.options.length}</kbd> to answer.</p>
-          <button class="btn btn-primary" id="btn-id-replay">▶ Replay Target Word</button>
+          <button class="btn btn-primary" id="btn-id-replay">▶ Replay target word</button>
         </div>
 
         <div class="quiz-options-grid">${optionsHtml}</div>
@@ -1381,12 +1440,12 @@ class SoundsEnglishApp {
       feedbackHtml = `
         <div class="feedback-banner ${isRight ? 'is-correct' : 'is-wrong'}">
           <div>
-            <strong>${isRight ? 'Correct!' : 'Incorrect.'} Word 1 was "${q.wordA.text}" (${q.wordA.ipa}) · Word 2 was "${q.wordB.text}" (${q.wordB.ipa}).</strong>
-            <div style="font-size:0.82rem; color:var(--text-secondary);">${q.tokenNote}</div>
+            <strong>${isRight ? 'Correct.' : 'Incorrect.'} Word 1 was "${q.wordA.text}" (${q.wordA.ipa}) · Word 2 was "${q.wordB.text}" (${q.wordB.ipa}).</strong>
+            <div class="feedback-sub">${q.tokenNote}</div>
           </div>
-          <div style="display:flex; gap:0.5rem;">
-            <button class="btn btn-sm" id="btn-ax-replay-2">▶ Replay Pair</button>
-            <button class="btn btn-primary btn-sm" id="btn-ax-next">Next Pair →</button>
+          <div class="feedback-actions">
+            <button class="btn" id="btn-ax-replay-2">▶ Replay pair</button>
+            <button class="btn btn-primary" id="btn-ax-next">Next pair →</button>
           </div>
         </div>
       `;
@@ -1403,14 +1462,14 @@ class SoundsEnglishApp {
     panel.innerHTML = `
       <div class="quiz-stage">
         <div class="quiz-meta-bar">
-          <span>AX Score: <span class="mono">${q.score} / ${q.total}</span> (${q.total ? acc + '%' : '—'})</span>
-          <span>Target Contrast: <span class="mono">${unit.title}</span></span>
+          <span>AX score: <strong>${q.score} / ${q.total}</strong> (${q.total ? acc + '%' : '-'})</span>
+          <span>Target contrast: <strong>${unit.title}</strong></span>
         </div>
 
-        <div class="quiz-prompt-box">
-          <h3>Are these two recordings the SAME word or DIFFERENT words?</h3>
+        <div class="quiz-prompt-block">
+          <h3>Are these two recordings the same word or different words?</h3>
           <p>Trains phonemic categorization across acoustic tokens rather than raw waveform matching.</p>
-          <button class="btn btn-primary" id="btn-ax-replay">▶ Play the two words</button>
+          <button class="btn btn-primary" id="btn-ax-replay">▶ Play both words</button>
         </div>
 
         <div class="quiz-options-grid">
@@ -1420,8 +1479,8 @@ class SoundsEnglishApp {
             ${q.answered && q.isSame ? 'data-state="correct"' : q.answered && q.userSaidSame === true && !q.isSame ? 'data-state="wrong"' : ''}
             ${q.answered ? 'disabled' : ''}
           >
-            <span class="opt-word">Same Word</span>
-            <span class="opt-ipa">Key 1 / S</span>
+            <span class="opt-word">Same word</span>
+            <span class="opt-key">Key 1 / S</span>
           </button>
           <button
             class="quiz-option-btn"
@@ -1429,8 +1488,8 @@ class SoundsEnglishApp {
             ${q.answered && !q.isSame ? 'data-state="correct"' : q.answered && q.userSaidSame === false && q.isSame ? 'data-state="wrong"' : ''}
             ${q.answered ? 'disabled' : ''}
           >
-            <span class="opt-word">Different Words</span>
-            <span class="opt-ipa">Key 2 / D</span>
+            <span class="opt-word">Different words</span>
+            <span class="opt-key">Key 2 / D</span>
           </button>
         </div>
 
@@ -1472,11 +1531,11 @@ class SoundsEnglishApp {
       )
       .join('');
 
-    const wordChipsHtml = targetWords
+    const wordSegmentsHtml = targetWords
       .map(
         (w, i) => `
         <button
-          class="subgroup-pill"
+          class="segmented-btn"
           data-rec-word-idx="${i}"
           aria-pressed="${w === this.selectedRecWord}"
         >
@@ -1488,35 +1547,35 @@ class SoundsEnglishApp {
     panel.innerHTML = `
       <div class="record-lab">
         <div class="subgroup-bar">
-          <label style="font-size:0.88rem; font-weight:600;">
-            Practice Contrast:
-            <select id="rec-pair-select" class="btn btn-sm" style="margin-left:0.4rem;">
+          <label class="subgroup-heading">
+            Practice contrast:
+            <select id="rec-pair-select" class="studio-select" style="margin-left:0.45rem;">
               ${pairOptionsHtml}
             </select>
           </label>
-          <button class="btn btn-sm" id="btn-have-a-go">▶ "Have a go!" Prompt</button>
+          <button class="action-link" id="btn-have-a-go">▶ "Have a go!" prompt</button>
         </div>
 
-        <div class="subgroup-pills">${wordChipsHtml}</div>
+        <div class="segmented-control" role="group" aria-label="Target word">${wordSegmentsHtml}</div>
 
-        <div class="quiz-prompt-box">
-          <h3>Active Target: <span style="color:var(--accent-primary)">${this.selectedRecWord.text}</span> <span style="font-family:var(--font-mono)">${this.selectedRecWord.ipa}</span></h3>
-          <p>1. Listen to Frederica's 1994 model · 2. Hold or toggle Record and say the word · 3. Compare side-by-side on the Spectrum Meter.</p>
+        <div class="quiz-prompt-block">
+          <h3>Active target: <span style="color:var(--accent-primary)">${this.selectedRecWord.text}</span> <span class="text-secondary">${this.selectedRecWord.ipa}</span></h3>
+          <p>Listen to Frederica's 1994 model, record your pronunciation, then compare side-by-side on the spectrum meter.</p>
 
-          <div class="record-controls" style="justify-content:center;">
-            <button class="btn" id="btn-rec-play-native">▶ Play Native Model</button>
+          <div class="record-controls">
+            <button class="btn" id="btn-rec-play-native">▶ Play native model</button>
             <button class="btn ${this.audio.isRecording ? 'btn-record-active' : 'btn-primary'}" id="btn-rec-toggle">
-              ${this.audio.isRecording ? '■ Stop Recording' : '● Record Your Voice'}
+              ${this.audio.isRecording ? '■ Stop recording' : '● Record your voice'}
             </button>
             <button class="btn" id="btn-rec-play-user" ${!this.audio.userBuffer ? 'disabled' : ''}>
-              ▶ Play Yours
+              ▶ Play yours
             </button>
-            <button class="btn btn-primary" id="btn-rec-compare" ${!this.audio.userBuffer ? 'disabled' : ''}>
+            <button class="btn" id="btn-rec-compare" ${!this.audio.userBuffer ? 'disabled' : ''}>
               ⇄ Compare (Native → You → Native)
             </button>
           </div>
-          <p id="rec-status" style="margin-top:0.75rem; margin-bottom:0; font-size:0.82rem; color:var(--text-secondary);">
-            ${this.audio.userBuffer ? 'Recording captured! Click "Compare" to hear Native → You → Native.' : 'No microphone recording captured yet.'}
+          <p id="rec-status" class="record-status">
+            ${this.audio.userBuffer ? 'Recording captured. Click "Compare" to hear Native → You → Native.' : 'No microphone recording captured yet.'}
           </p>
         </div>
 
@@ -1562,7 +1621,7 @@ class SoundsEnglishApp {
           await this.audio.startRecording();
           this.renderRecordMode(panel, unit);
           const s = document.getElementById('rec-status');
-          if (s) s.textContent = 'Recording live… speak into your microphone, then click Stop.';
+          if (s) s.textContent = 'Recording live... speak into your microphone, then click Stop.';
         } catch (err) {
           if (statusEl) statusEl.textContent = `Microphone unavailable: ${err.message}`;
         }
@@ -1596,10 +1655,10 @@ class SoundsEnglishApp {
 
     if (c.tooQuiet) {
       return `
-        <div class="similarity-card is-low">
+        <div class="similarity-report is-low">
           <div class="similarity-header">
-            <h4>Acoustic Comparison</h4>
-            <span class="similarity-score">—</span>
+            <h4>Acoustic comparison</h4>
+            <span class="similarity-score">-</span>
           </div>
           <ul class="similarity-tips">
             ${c.tips.map((t) => `<li>${t}</li>`).join('')}
@@ -1612,12 +1671,12 @@ class SoundsEnglishApp {
     const hasSib = c.modelSibilantHz > 0 && c.userSibilantHz > 0;
 
     return `
-      <div class="similarity-card ${tierClass}">
+      <div class="similarity-report ${tierClass}">
         <div class="similarity-header">
           <div>
-            <h4>Acoustic Similarity to Model</h4>
-            <span style="font-size:0.78rem; color:var(--text-secondary);">
-              Bark-band spectral trajectory + centroid + active duration
+            <h4>Acoustic similarity to model</h4>
+            <span class="similarity-sub">
+              Bark-band spectral trajectory, centroid, and active duration
             </span>
           </div>
           <span class="similarity-score">${c.overallPct}%</span>
@@ -1628,22 +1687,22 @@ class SoundsEnglishApp {
         </div>
 
         <div class="similarity-metrics">
-          <div class="metric-pill">
-            <span>Spectral Match</span>
+          <div class="metric-item">
+            <span>Spectral match</span>
             <strong>${c.spectralPct}%</strong>
           </div>
-          <div class="metric-pill">
+          <div class="metric-item">
             <span>Duration (${c.userMs} vs ${c.modelMs} ms)</span>
             <strong>${c.durationPct}%</strong>
           </div>
-          <div class="metric-pill">
-            <span>${hasSib ? `Fricative Peak (${c.userSibilantHz} vs ${c.modelSibilantHz} Hz)` : `Centroid (${c.userCentroidHz} vs ${c.modelCentroidHz} Hz)`}</span>
+          <div class="metric-item">
+            <span>${hasSib ? `Fricative peak (${c.userSibilantHz} vs ${c.modelSibilantHz} Hz)` : `Centroid (${c.userCentroidHz} vs ${c.modelCentroidHz} Hz)`}</span>
             <strong>${c.centroidPct}%</strong>
           </div>
         </div>
 
         <div class="similarity-tips-wrap">
-          <h5>Coaching Feedback</h5>
+          <h5>Coaching feedback</h5>
           <ul class="similarity-tips">
             ${c.tips.map((t) => `<li>${t}</li>`).join('')}
           </ul>

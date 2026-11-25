@@ -298,12 +298,12 @@ export class AudioEngine {
     ctx2d.clearRect(0, 0, width, height);
     this.drawGuides(ctx2d, width, height);
 
-    ctx2d.fillStyle = 'rgba(148, 163, 184, 0.45)';
+    ctx2d.fillStyle = 'rgba(148, 163, 184, 0.72)';
     ctx2d.font = '500 12px system-ui, sans-serif';
     ctx2d.textAlign = 'center';
     const label = this.userBuffer
-      ? 'Ready — click any word or Compare to inspect acoustic spectrum'
-      : 'Click any word or + pair button to inspect live FFT spectrum & waveform';
+      ? 'Ready: click any word or Compare to inspect the acoustic spectrum'
+      : 'Click any word or + pair button to inspect live FFT spectrum and waveform';
     ctx2d.fillText(label, width / 2, height / 2);
   }
 
@@ -332,11 +332,11 @@ export class AudioEngine {
 
       ctx2d.font = '600 10px system-ui, sans-serif';
       ctx2d.textAlign = 'center';
-      ctx2d.fillStyle = 'rgba(56, 189, 248, 0.9)';
-      ctx2d.fillText('/ʃ/ 2.5–3.8 kHz', (x1 + x2) / 2, 14);
-      ctx2d.fillStyle = 'rgba(245, 158, 11, 0.9)';
-      ctx2d.fillText('Greek [s̠] trap', (gx1 + gx2) / 2, 14);
-      ctx2d.fillStyle = 'rgba(16, 185, 129, 0.9)';
+      ctx2d.fillStyle = 'rgba(56, 189, 248, 0.92)';
+      ctx2d.fillText('/ʃ/ 2.5–3.8k', (x1 + x2) / 2, 14);
+      ctx2d.fillStyle = 'rgba(245, 158, 11, 0.92)';
+      ctx2d.fillText('[s̠] trap', (gx1 + gx2) / 2, 14);
+      ctx2d.fillStyle = 'rgba(16, 185, 129, 0.92)';
       ctx2d.fillText('/s/ 6–8.5 kHz', (sx1 + sx2) / 2, 14);
     } else if (this.spectralMode === 'vowel') {
       // F1 (250 - 900 Hz) & F2 (900 - 2600 Hz) formant regions
@@ -346,25 +346,25 @@ export class AudioEngine {
       const f2b = freqToX(2600);
       ctx2d.fillStyle = 'rgba(56, 189, 248, 0.10)';
       ctx2d.fillRect(f1a, 0, f1b - f1a, height);
-      ctx2d.fillStyle = 'rgba(168, 85, 247, 0.10)';
+      ctx2d.fillStyle = 'rgba(6, 182, 212, 0.12)';
       ctx2d.fillRect(f2a, 0, f2b - f2a, height);
 
       ctx2d.font = '600 10px system-ui, sans-serif';
       ctx2d.textAlign = 'center';
-      ctx2d.fillStyle = 'rgba(56, 189, 248, 0.9)';
+      ctx2d.fillStyle = 'rgba(56, 189, 248, 0.92)';
       ctx2d.fillText('F1 Jaw Height (250–900 Hz)', (f1a + f1b) / 2, 14);
-      ctx2d.fillStyle = 'rgba(168, 85, 247, 0.9)';
+      ctx2d.fillStyle = 'rgba(34, 211, 238, 0.92)';
       ctx2d.fillText('F2 Tongue Frontness (0.9–2.6 kHz)', (f2a + f2b) / 2, 14);
     } else {
       ctx2d.font = '600 10px system-ui, sans-serif';
       ctx2d.textAlign = 'left';
-      ctx2d.fillStyle = 'rgba(148, 163, 184, 0.75)';
+      ctx2d.fillStyle = 'rgba(148, 163, 184, 0.8)';
       ctx2d.fillText('Spectrum (0–10 kHz) + Time-Domain Envelope', 10, 14);
     }
 
     // Frequency ticks
-    ctx2d.fillStyle = 'rgba(148, 163, 184, 0.5)';
-    ctx2d.font = '500 10px ui-monospace, monospace';
+    ctx2d.fillStyle = 'rgba(148, 163, 184, 0.55)';
+    ctx2d.font = '500 10px system-ui, sans-serif';
     ctx2d.textAlign = 'center';
     const step = maxFreq === 4000 ? 1000 : 2000;
     for (let hz = step; hz < maxFreq; hz += step) {
@@ -419,13 +419,13 @@ export class AudioEngine {
     ctx2d.closePath();
 
     const grad = ctx2d.createLinearGradient(0, plotTop, width, plotBottom);
-    grad.addColorStop(0, 'rgba(56, 189, 248, 0.45)');
-    grad.addColorStop(0.5, 'rgba(99, 102, 241, 0.35)');
-    grad.addColorStop(1, 'rgba(16, 185, 129, 0.45)');
+    grad.addColorStop(0, 'rgba(56, 189, 248, 0.44)');
+    grad.addColorStop(0.5, 'rgba(14, 165, 233, 0.30)');
+    grad.addColorStop(1, 'rgba(34, 211, 238, 0.42)');
     ctx2d.fillStyle = grad;
     ctx2d.fill();
 
-    ctx2d.strokeStyle = this.isRecording ? '#f43f5e' : '#38bdf8';
+    ctx2d.strokeStyle = this.isRecording ? '#fb7185' : '#38bdf8';
     ctx2d.lineWidth = 2;
     ctx2d.stroke();
 
