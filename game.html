@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102e3b">
+  <title>Sound Delivery | Sounds English to Me</title>
+  <link rel="icon" href="./icons/icon-192.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./game.css">
+  <script type="module" src="./js/game-engine.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="studio-link" href="./index.html">← Sounds English to Me</a>
+      <button type="button" id="back" class="back" hidden>Χάρτης</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="map" aria-labelledby="map-title">
+      <div class="hero">
+        <div>
+          <h1 id="map-title" lang="en" tabindex="-1">Sound<br>Delivery</h1>
+          <p>Άκου τη λέξη στον ασύρματο και παράδωσε το δέμα στη σωστή κάρτα.</p>
+        </div>
+        <div class="parcel" aria-hidden="true">📦</div>
+      </div>
+
+      <p id="load-status" role="status">Φόρτωση αποστολών…</p>
+      <div class="worlds" id="worlds"></div>
+
+      <details class="classroom">
+        <summary>Λειτουργία τάξης</summary>
+        <p>Οι ολοκληρωμένοι γύροι αποθηκεύονται σε αυτόν τον browser όταν επιλέγεις κωδικό μαθητή.</p>
+        <div class="classroom-controls">
+          <label for="student">Κωδικός μαθητή</label>
+          <select id="student"><option value="">Επισκέπτης</option></select>
+          <button id="export" type="button" class="secondary">Λήψη CSV</button>
+        </div>
+        <p id="export-status" role="status"></p>
+      </details>
+    </section>
+
+    <section id="mission" aria-labelledby="mission-title" hidden>
+      <div class="mission-header">
+        <div>
+          <h1 id="mission-title" tabindex="-1"></h1>
+          <p id="round-count"></p>
+        </div>
+        <progress id="progress" aria-label="Ολοκληρωμένες παραδόσεις"></progress>
+      </div>
+      <div class="radio">
+        <button id="listen" type="button" class="listen">▶ Άκου τη λέξη</button>
+        <p id="feedback" role="status"></p>
+      </div>
+      <div class="answers" aria-label="Διάλεξε κάρτα">
+        <button type="button" class="answer" data-choice="0" disabled>
+          <span class="choice-key" aria-hidden="true">1</span>
+          <span class="answer-icon" aria-hidden="true"></span>
+          <span class="answer-word" lang="en"></span>
+        </button>
+        <button type="button" class="answer" data-choice="1" disabled>
+          <span class="choice-key" aria-hidden="true">2</span>
+          <span class="answer-icon" aria-hidden="true"></span>
+          <span class="answer-word" lang="en"></span>
+        </button>
+      </div>
+      <button id="next" type="button" class="primary next" hidden>Επόμενη παράδοση →</button>
+    </section>
+
+    <section id="results" class="results" aria-labelledby="result-title" hidden>
+      <span class="result-icon" aria-hidden="true">📬</span>
+      <h1 id="result-title" tabindex="-1">Αποστολή ολοκληρώθηκε!</h1>
+      <p id="score"></p>
+      <p id="save-status" role="status"></p>
+      <div class="result-actions">
+        <button id="again" type="button" class="primary">Ξανά την ίδια αποστολή</button>
+        <button id="results-map" type="button" class="secondary">Πίσω στον χάρτη</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
