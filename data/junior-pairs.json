@@ -1,0 +1,79 @@
+{
+  "worlds": [
+    {
+      "id": "harbor",
+      "title": "Το λιμάνι",
+      "contrast": "/s/ – /ʃ/",
+      "icon": "⚓",
+      "studioUnit": "unit1",
+      "phonemes": ["s", "ʃ"],
+      "pairs": [
+        {
+          "id": "sip-ship",
+          "words": [{ "text": "sip", "icon": "🥤" }, { "text": "ship", "icon": "🚢" }],
+          "recordings": [{ "speaker": "archive", "files": ["SIP.WAV", "SHIP.WAV"] }]
+        },
+        {
+          "id": "seat-sheet",
+          "words": [{ "text": "seat", "icon": "💺" }, { "text": "sheet", "icon": "📄" }],
+          "recordings": [{ "speaker": "archive", "files": ["SEAT.WAV", "SHEET.WAV"] }]
+        },
+        {
+          "id": "sell-shell",
+          "words": [{ "text": "sell", "icon": "🏷️" }, { "text": "shell", "icon": "🐚" }],
+          "recordings": [{ "speaker": "archive", "files": ["SELL.WAV", "SHELL.WAV"] }]
+        },
+        {
+          "id": "save-shave",
+          "words": [{ "text": "save", "icon": "💰" }, { "text": "shave", "icon": "🪒" }],
+          "recordings": [{ "speaker": "archive", "files": ["SAVE.WAV", "SHAVE.WAV"] }]
+        }
+      ]
+    },
+    {
+      "id": "valley",
+      "title": "Η πράσινη κοιλάδα",
+      "contrast": "/ɪ/ – /iː/",
+      "icon": "⛰️",
+      "studioUnit": "unit8",
+      "phonemes": ["ɪ", "iː"],
+      "pairs": [
+        {
+          "id": "bin-bean",
+          "words": [{ "text": "bin", "icon": "🗑️" }, { "text": "bean", "icon": "🫘" }],
+          "recordings": [{ "speaker": "archive", "files": ["BIN.WAV", "BEAN.WAV"] }]
+        },
+        {
+          "id": "ship-sheep",
+          "words": [{ "text": "ship", "icon": "🚢" }, { "text": "sheep", "icon": "🐑" }],
+          "recordings": [{ "speaker": "archive", "files": ["SHIP.WAV", "SHEEP.WAV"] }]
+        }
+      ]
+    },
+    {
+      "id": "village",
+      "title": "Το μικρό χωριό",
+      "contrast": "/æ/ – /ʌ/",
+      "icon": "🏡",
+      "studioUnit": "unit9",
+      "phonemes": ["æ", "ʌ"],
+      "pairs": [
+        {
+          "id": "cat-cut",
+          "words": [{ "text": "cat", "icon": "🐱" }, { "text": "cut", "icon": "✂️" }],
+          "recordings": [{ "speaker": "archive", "files": ["CAT.WAV", "CUT.WAV"] }]
+        },
+        {
+          "id": "hat-hut",
+          "words": [{ "text": "hat", "icon": "🎩" }, { "text": "hut", "icon": "🛖" }],
+          "recordings": [{ "speaker": "archive", "files": ["HAT.WAV", "HUT.WAV"] }]
+        },
+        {
+          "id": "ham-hum",
+          "words": [{ "text": "ham", "icon": "🥪" }, { "text": "hum", "icon": "🎶" }],
+          "recordings": [{ "speaker": "archive", "files": ["HAM.WAV", "HUM.WAV"] }]
+        }
+      ]
+    }
+  ]
+}
